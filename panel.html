@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#12286b">
+<title>Panel de dueños · La Cachanilla</title>
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+<script src="assets/js/auth.js"></script>
+<script>requerirSesion();</script>
+<style>
+  .barras{display:flex;gap:8px;align-items:flex-end;height:170px;padding-top:10px}
+  .barras div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--gris)}
+  .barras i{display:block;width:100%;max-width:46px;background:var(--cobalto);border-radius:8px 8px 0 0;min-height:3px}
+  .barras div:last-child i{background:var(--rosa)}
+  .barras b{font-size:11px;color:var(--tinta)}
+  .dos{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+  @media (max-width:820px){ .dos{grid-template-columns:1fr} }
+  .tabla td{padding:6px 4px}
+  .tabla textarea{width:100%;min-width:180px;padding:6px 8px;border:1.5px solid var(--linea);border-radius:8px;font-size:13px;resize:vertical}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="adm-top">
+    <a class="marca" href="panel.html"><i></i><span>La Cachanilla<small>Panel de dueños</small></span></a>
+    <span class="sp"></span>
+    <nav class="tabs">
+      <button data-v="resumen" class="on">Resumen</button>
+      <button data-v="catalogo">Catálogo de la semana</button>
+      <button data-v="seguridad">Seguridad</button>
+      <a href="pos.html">Caja (POS)</a>
+      <button class="salir" onclick="cerrarSesion()">Salir</button>
+    </nav>
+  </header>
+
+  <div class="contenido">
+    <!-- RESUMEN -->
+    <section class="vista on" id="resumen">
+      <h2 id="saludo">¡Hola!</h2>
+      <p class="sub">Así va el negocio según las ventas registradas en la caja de este equipo.</p>
+      <div class="accesos">
+        <a class="acc" href="pos.html"><em>🧾</em><span>Abrir caja<small>Cobrar ventas</small></span></a>
+        <button class="acc" data-ir="catalogo"><em>🥐</em><span>Catálogo de la semana<small>Qué se puede pedir</small></span></button>
+        <a class="acc" href="pedidos.html" target="_blank"><em>🛍️</em><span>Ver página de pedidos<small>Como la ve el cliente</small></span></a>
+        <a class="acc" href="https://claude.ai/artifact/SkHFpZpqz4LhkgVxrusDSj" target="_blank" rel="noopener"><em>📦</em><span>Caja con inventario<small>Pre-órdenes e inventario</small></span></a>
+      </div>
+      <div class="kpis" id="kpis"></div>
+      <div class="dos">
+        <div class="caja"><h3>Ventas de los últimos 7 días</h3><div class="barras" id="barras"></div></div>
+        <div class="caja"><h3>Más vendidos (7 días)</h3><div id="top"></div></div>
+      </div>
+    </section>
+
+    <!-- CATÁLOGO -->
+    <section class="vista" id="catalogo">
+      <h2>Catálogo de la semana</h2>
+      <p class="sub">Marca qué productos se pueden pedir esta semana, cuáles salen en la portada y ajusta precios.</p>
+      <div class="aviso">
+        <b>Cómo publicar los cambios:</b> 1) Edita y pulsa <b>Guardar</b> (la caja de este equipo usa los precios nuevos al instante).
+        2) Pulsa <b>Descargar catalogo.js</b>. 3) En GitHub entra a <code>assets/js/</code> → <i>Add file → Upload files</i>, sube el archivo y pulsa <i>Commit</i>. En 1–2 minutos los clientes ven el catálogo nuevo.
+      </div>
+      <div class="caja">
+        <label class="campo">Título del catálogo<input id="tSemana"></label>
+        <div class="tabla"><table>
+          <thead><tr><th title="Disponible esta semana">Disp.</th><th title="Sale en la portada">Portada</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Descripción</th><th>Foto (ruta)</th><th></th></tr></thead>
+          <tbody id="filas"></tbody>
+        </table></div>
+        <div class="fila" style="margin-top:14px">
+          <button class="b b-sec" id="agregar">+ Agregar producto</button>
+          <span style="flex:1"></span>
+          <button class="b b-rojo" id="descartar">Volver al publicado</button>
+          <button class="b b-pri" id="guardar">Guardar</button>
+          <button class="b b-rosa" id="bajar">Descargar catalogo.js</button>
+        </div>
+        <p class="sub" id="estado" style="margin:10px 0 0;font-size:13px"></p>
+      </div>
+    </section>
+
+    <!-- SEGURIDAD -->
+    <section class="vista" id="seguridad">
+      <h2>Seguridad</h2>
+      <div class="aviso">Este acceso mantiene el panel fuera de la vista de los clientes, pero el sitio es estático: no guardes aquí información sensible. <b>Cambia la contraseña temporal</b> cuanto antes.</div>
+      <div class="caja" style="max-width:560px">
+        <h3>Cambiar usuario o contraseña</h3>
+        <label class="campo">Usuario<input id="sU" autocapitalize="none"></label>
+        <label class="campo">Contraseña nueva (mínimo 10 caracteres)<input id="sP1" type="password" autocomplete="new-password"></label>
+        <label class="campo">Repite la contraseña<input id="sP2" type="password" autocomplete="new-password"></label>
+        <button class="b b-pri" id="sGen">Generar</button>
+        <div id="sOut" style="display:none;margin-top:14px">
+          <p style="font-size:14px">Copia esta línea y, en GitHub, reemplaza la línea del usuario en <code>assets/js/auth.js</code> (dentro de <code>USUARIOS</code>). Haz <i>Commit</i> y la contraseña nueva queda activa.</p>
+          <pre id="sLinea"></pre>
+          <button class="b b-sec" id="sCopiar">Copiar línea</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/admin-comun.js"></script>
+<script>
+  const s = sesionActual();
+  const h = new Date().getHours();
+  $('#saludo').textContent = (h < 12 ? '¡Buenos días' : h < 19 ? '¡Buenas tardes' : '¡Buenas noches') + ', equipo Cachanilla!';
+
+  /* ---------- Resumen ---------- */
+  function pintarResumen() {
+    const todas = ventas();
+    const hoy = resumirVentas(todas.filter(v => diaKey(v.ts) === hoyKey()));
+    const desde = new Date(); desde.setHours(0, 0, 0, 0); desde.setDate(desde.getDate() - 6);
+    const sem = todas.filter(v => v.ts >= desde.getTime());
+    const rs = resumirVentas(sem);
+    $('#kpis').innerHTML = `
+      <div class="kpi"><span>Vendido hoy</span><b>${money(hoy.total)}</b></div>
+      <div class="kpi"><span>Ventas hoy</span><b>${hoy.n}</b></div>
+      <div class="kpi"><span>Últimos 7 días</span><b>${money(rs.total)}</b></div>
+      <div class="kpi"><span>Ticket promedio</span><b>${money(rs.n ? rs.total / rs.n : 0)}</b></div>`;
+    const dias = Array.from({ length: 7 }, (_, i) => { const d = new Date(desde); d.setDate(d.getDate() + i); return d; });
+    const tot = dias.map(d => resumirVentas(todas.filter(v => diaKey(v.ts) === diaKey(d))).total);
+    const max = Math.max(...tot, 1);
+    $('#barras').innerHTML = dias.map((d, i) => `<div><b>${tot[i] ? '$' + Math.round(tot[i]) : ''}</b><i style="height:${(tot[i] / max) * 100}%"></i>${d.toLocaleDateString('es-PR', { weekday: 'short' })}</div>`).join('');
+    const top = Object.entries(rs.productos).sort((a, b) => b[1].q - a[1].q).slice(0, 6);
+    $('#top').innerHTML = top.length ? '<table>' + top.map(([n, p], i) => `<tr><td>${i + 1}. ${esc(n)}</td><td class="n"><b>${p.q}</b></td><td class="n">${money(p.total)}</td></tr>`).join('') + '</table>'
+      : '<p class="vacio">Aún no hay ventas registradas en la caja.</p>';
+  }
+
+  /* ---------- Catálogo ---------- */
+  let lista = catalogoActivo();
+  let semana = store.get('catalogo_semana', window.CACHANILLA.semana);
+  const hayBorrador = () => !!store.get('catalogo_borrador', null);
+  function pintarCatalogo() {
+    $('#tSemana').value = semana;
+    $('#filas').innerHTML = lista.map((p, i) => `
+      <tr data-i="${i}">
+        <td><input type="checkbox" data-k="disponible" ${p.disponible ? 'checked' : ''}></td>
+        <td><input type="checkbox" data-k="destacado" ${p.destacado ? 'checked' : ''}></td>
+        <td><input type="text" data-k="nombre" value="${esc(p.nombre)}"></td>
+        <td><input type="text" data-k="cat" value="${esc(p.cat)}" list="cats" style="min-width:100px"></td>
+        <td><input type="number" class="precio" step="0.05" min="0" data-k="precio" value="${p.precio}"></td>
+        <td><textarea rows="2" data-k="desc">${esc(p.desc || '')}</textarea></td>
+        <td><input type="text" data-k="img" value="${esc(p.img || '')}" style="min-width:170px"></td>
+        <td><button class="b b-rojo" style="padding:6px 10px" data-borrar="${i}" title="Quitar">✕</button></td>
+      </tr>`).join('') + `<datalist id="cats">${[...new Set(lista.map(p => p.cat))].map(c => `<option value="${esc(c)}">`).join('')}</datalist>`;
+    const n = lista.filter(p => p.disponible).length;
+    $('#estado').textContent = `${n} de ${lista.length} productos disponibles esta semana · ` + (hayBorrador() ? 'Tienes cambios guardados en este equipo (aún no publicados si no subiste el archivo).' : 'Mostrando el catálogo publicado.');
+  }
+  $('#filas').addEventListener('input', e => {
+    const el = e.target, tr = el.closest('tr'); if (!tr || !el.dataset.k) return;
+    const p = lista[tr.dataset.i];
+    p[el.dataset.k] = el.type === 'checkbox' ? el.checked : el.type === 'number' ? r2(Number(el.value) || 0) : el.value;
+  });
+  $('#filas').addEventListener('click', e => {
+    const b = e.target.closest('[data-borrar]'); if (!b) return;
+    if (confirm('¿Quitar "' + lista[b.dataset.borrar].nombre + '" del catálogo?')) { lista.splice(b.dataset.borrar, 1); pintarCatalogo(); }
+  });
+  $('#tSemana').oninput = e => semana = e.target.value;
+  $('#agregar').onclick = () => {
+    lista.push({ id: 'n' + Date.now().toString(36), nombre: 'Producto nuevo', precio: 0, cat: 'Pan dulce', disponible: true, destacado: false, img: 'assets/img/productos/nuevo.jpg', desc: '' });
+    pintarCatalogo(); const f = $$('#filas tr'); f[f.length - 1].querySelector('[data-k=nombre]').select();
+  };
+  function validar() {
+    const malo = lista.find(p => !p.nombre.trim() || !(p.precio > 0));
+    if (malo) { toast('Revisa nombre y precio de: ' + (malo.nombre || 'producto sin nombre'), true); return false; }
+    return true;
+  }
+  $('#guardar').onclick = () => { if (!validar()) return; store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana); toast('Guardado en este equipo'); pintarCatalogo(); };
+  $('#descartar').onclick = () => {
+    if (!confirm('¿Descartar tus cambios y volver al catálogo publicado?')) return;
+    store.del('catalogo_borrador'); store.del('catalogo_semana');
+    lista = catalogoActivo(); semana = window.CACHANILLA.semana; pintarCatalogo(); toast('Listo');
+  };
+  $('#bajar').onclick = () => {
+    if (!validar()) return;
+    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana);
+    const datos = Object.assign({}, window.CACHANILLA, { semana, productos: lista });
+    const js = `/* =====================================================================
+   LA CACHANILLA · DATOS DEL NEGOCIO Y CATÁLOGO DE LA SEMANA
+   Generado desde el Panel de dueños el ${new Date().toLocaleString('es-PR')}.
+   Sube este archivo a GitHub en assets/js/ para publicarlo.
+   ===================================================================== */
+window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
+`;
+    descargar('catalogo.js', js, 'text/javascript;charset=utf-8');
+    pintarCatalogo();
+  };
+
+  /* ---------- Seguridad ---------- */
+  $('#sU').value = s ? s.u : '';
+  $('#sGen').onclick = async () => {
+    const u = $('#sU').value.trim().toLowerCase(), p1 = $('#sP1').value, p2 = $('#sP2').value;
+    if (!/^[a-z0-9._-]{3,}$/.test(u)) return toast('Usuario: mínimo 3 letras o números, sin espacios', true);
+    if (p1.length < 10) return toast('La contraseña debe tener al menos 10 caracteres', true);
+    if (p1 !== p2) return toast('Las contraseñas no coinciden', true);
+    const hash = await hashCredencial(u, p1);
+    $('#sLinea').textContent = `{ usuario: '${u}', hash: '${hash}' },`;
+    $('#sOut').style.display = 'block'; $('#sP1').value = $('#sP2').value = '';
+  };
+  $('#sCopiar').onclick = () => copiar($('#sLinea').textContent);
+
+  /* ---------- Navegación ---------- */
+  function ir(v) {
+    $$('.tabs button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    $$('.vista').forEach(x => x.classList.toggle('on', x.id === v));
+    if (v === 'resumen') pintarResumen();
+    if (v === 'catalogo') pintarCatalogo();
+    scrollTo(0, 0);
+  }
+  $$('.tabs button[data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));
+  $$('[data-ir]').forEach(b => b.onclick = () => ir(b.dataset.ir));
+  pintarResumen();
+</script>
+</body>
+</html>

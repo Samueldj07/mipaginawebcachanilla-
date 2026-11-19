@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Acceso dueños · La Cachanilla</title>
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+<main class="acceso">
+  <form class="caja-login form" id="f">
+    <a class="logo" href="index.html"><i></i><span>La Cachanilla<small>Área de dueños</small></span></a>
+    <p class="nota" style="text-align:center;margin:4px 0 8px">Panel de administración y caja (POS)</p>
+    <label for="u">Usuario</label>
+    <input id="u" autocomplete="username" required autocapitalize="none">
+    <label for="p">Contraseña</label>
+    <input id="p" type="password" autocomplete="current-password" required>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="ver" style="width:auto"> Mostrar contraseña</label>
+    <button class="btn btn-azul" style="width:100%;justify-content:center;margin-top:14px" id="b">Entrar</button>
+    <div class="error" id="err"></div>
+    <p style="text-align:center;margin:18px 0 0"><a href="index.html">← Volver al sitio</a></p>
+  </form>
+</main>
+<script src="assets/js/auth.js"></script>
+<script>
+  const q = s => document.querySelector(s);
+  const volver = new URLSearchParams(location.search).get('volver');
+  const destino = /^[\w-]+\.html$/.test(volver || '') ? volver : 'panel.html';
+  if (sesionActual()) location.replace(destino);
+
+  q('#ver').onchange = e => q('#p').type = e.target.checked ? 'text' : 'password';
+  q('#f').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = q('#err');
+    const bloqueo = Number(localStorage.getItem('cach_bloqueo') || 0);
+    if (bloqueo > Date.now()) { err.textContent = 'Demasiados intentos. Espera ' + Math.ceil((bloqueo - Date.now()) / 1000) + ' segundos.'; err.classList.add('on'); return; }
+    q('#b').disabled = true;
+    const ok = await iniciarSesion(q('#u').value, q('#p').value);
+    q('#b').disabled = false;
+    if (ok) { localStorage.removeItem('cach_intentos'); location.replace(destino); return; }
+    const n = Number(localStorage.getItem('cach_intentos') || 0) + 1;
+    localStorage.setItem('cach_intentos', n);
+    if (n >= 5) { localStorage.setItem('cach_bloqueo', Date.now() + 60000); localStorage.setItem('cach_intentos', 0); }
+    err.textContent = 'Usuario o contraseña incorrectos.'; err.classList.add('on');
+    q('#p').value = ''; q('#p').focus();
+  });
+</script>
+</body>
+</html>

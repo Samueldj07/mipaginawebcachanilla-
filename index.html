@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Cachanilla · Panadería Mexicana en Puerto Rico</title>
+<meta name="description" content="Pan dulce mexicano, conchas, marranitos, teleras y aguas frescas hechos a mano en San Juan, Puerto Rico. Haz tu pedido de la semana.">
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script>window.phFoto=function(i){(window._phq=window._phq||[]).push(i)}</script>
+</head>
+<body data-page="inicio">
+<div id="site-header"></div>
+
+<main>
+  <!-- HERO -->
+  <section class="hero" style="padding:0">
+    <div class="wrap">
+      <div>
+        <span class="kicker">Panadería mexicana · Puerto Rico</span>
+        <h1>La Cachanilla</h1>
+        <p class="lead">Conchas recién horneadas, pan de piloncillo, teleras y aguas frescas con las recetas de México. Un antojo mexicano, donde quiera que vayamos.</p>
+        <div class="btns">
+          <a class="btn btn-rosa" href="pedidos.html">🛍️ Haz tu pedido</a>
+          <a class="btn btn-blanco" href="menu.html">Ver el menú</a>
+        </div>
+      </div>
+      <div style="position:relative">
+        <div class="plato">
+          <!-- ESPACIO PARA FOTO PRINCIPAL: sube assets/img/portada.jpg -->
+          <div class="foto"><img src="assets/img/portada.jpg" alt="Pan dulce de La Cachanilla" data-n="Tu foto de portada" onerror="phFoto(this)"></div>
+        </div>
+        <div class="sello">¡Hecho a mano!</div>
+      </div>
+    </div>
+    <svg class="ola" viewBox="0 0 1440 50" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 C 240 0 480 60 720 30 C 960 0 1200 60 1440 30 L1440 50 L0 50 Z" fill="#fbf6ec"/></svg>
+  </section>
+
+  <!-- DESTACADOS -->
+  <section>
+    <div class="wrap">
+      <div class="titulo rev">
+        <div class="cenefa"></div>
+        <h2>Favoritos de la semana</h2>
+        <p>Lo que más vuela de la vitrina. Pídelo antes de que se acabe.</p>
+      </div>
+      <div class="grid" id="destacados"></div>
+      <p style="text-align:center;margin-top:34px"><a class="btn btn-azul" href="menu.html">Ver todo el menú →</a></p>
+    </div>
+  </section>
+
+  <!-- VALORES -->
+  <section class="bg-azulejo">
+    <div class="wrap">
+      <div class="titulo rev">
+        <div class="cenefa"></div>
+        <h2>Sabor de México, hecho en la isla</h2>
+      </div>
+      <div class="valores">
+        <div class="valor rev"><div class="ico">🥖</div><h3>Horneado a mano</h3><p>Cada concha y cada telera se forma a mano, en tandas pequeñas, para que llegue fresca.</p></div>
+        <div class="valor rev"><div class="ico">🌮</div><h3>Recetas mexicanas</h3><p>Piloncillo, canela, azahar y masa de maíz: los sabores de la panadería de barrio en México.</p></div>
+        <div class="valor rev"><div class="ico">🌺</div><h3>Aguas frescas</h3><p>Jamaica y champurrado preparados el mismo día, para acompañar tu pan.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIDEO / INSTAGRAM -->
+  <section>
+    <div class="wrap">
+      <div class="titulo rev">
+        <div class="cenefa"></div>
+        <h2>Míranos en acción</h2>
+        <p>Del horno a tus manos. Síguenos en Instagram <a id="igLink" target="_blank" rel="noopener"></a></p>
+      </div>
+      <div class="reels" id="reelsInicio"></div>
+      <p style="text-align:center;margin-top:30px"><a class="btn btn-borde" href="instagram.html">Ver más videos</a></p>
+    </div>
+  </section>
+
+  <!-- EVENTOS -->
+  <section class="bg-rosa">
+    <div class="wrap">
+      <div class="titulo rev">
+        <div class="cenefa"></div>
+        <h2>¿Dónde encontrarnos?</h2>
+        <p>Estamos en mercados y eventos de San Juan. Aquí las próximas fechas.</p>
+      </div>
+      <div class="eventos" id="eventos"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="banda">
+    <div class="wrap">
+      <h2>¿Se te antojó?</h2>
+      <p style="font-size:19px;margin:0 0 26px">Elige tu pan del catálogo de la semana y te lo apartamos.</p>
+      <a class="btn btn-blanco" href="pedidos.html">Hacer mi pedido</a>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/instagram.js"></script>
+<script>
+  const D = window.CACHANILLA;
+  $('#destacados').innerHTML = D.productos.filter(p => p.destacado && p.disponible).slice(0, 4).map(p => `
+    <article class="card rev">
+      <div class="img">${fotoProducto(p)}<span class="tag">${esc(p.cat)}</span></div>
+      <div class="body"><h3>${esc(p.nombre)}</h3><p>${esc(p.desc)}</p><div class="precio">${money(p.precio)}</div></div>
+    </article>`).join('');
+  $('#eventos').innerHTML = D.negocio.eventos.map(e => `
+    <div class="evento rev"><div class="f">${esc(e.fecha)}</div><div><b>${esc(e.lugar)}</b><small>${esc(e.nota || '')}</small></div></div>`).join('');
+  const ig = $('#igLink'); ig.href = 'https://instagram.com/' + D.negocio.instagram; ig.textContent = '@' + D.negocio.instagram;
+  pintarReels('#reelsInicio', 2, true);
+  revelar();
+</script>
+</body>
+</html>

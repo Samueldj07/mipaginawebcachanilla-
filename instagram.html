@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Videos · La Cachanilla Panadería Mexicana</title>
+<meta name="description" content="Videos y reels de La Cachanilla en Instagram.">
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="instagram">
+<div id="site-header"></div>
+<main>
+  <div class="cabeza"><h1>Videos</h1><p>Lo que pasa en nuestra cocina y en cada evento. Síguenos en <a id="ig" style="color:var(--amarillo)" target="_blank" rel="noopener"></a></p></div>
+  <section>
+    <div class="wrap">
+      <div class="reels" id="reels"></div>
+      <p style="text-align:center;margin-top:36px"><a class="btn btn-rosa" id="igBtn" target="_blank" rel="noopener">Seguir en Instagram</a></p>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/site.js"></script>
+<script src="assets/js/instagram.js"></script>
+<script>
+  const ig = window.CACHANILLA.negocio.instagram;
+  $('#ig').textContent = '@' + ig; $('#ig').href = $('#igBtn').href = 'https://instagram.com/' + ig;
+  pintarReels('#reels', 6, true);
+</script>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#12286b">
+<title>Caja · La Cachanilla</title>
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+<script src="assets/js/auth.js"></script>
+<script>requerirSesion();</script>
+</head>
+<body>
+<div class="app pos">
+  <header class="adm-top">
+    <a class="marca" href="panel.html"><i></i><span>La Cachanilla<small>Caja · POS</small></span></a>
+    <span class="sp"></span>
+    <nav class="tabs">
+      <button data-v="vender" class="on">Vender</button>
+      <button data-v="hoy">Ventas de hoy</button>
+      <button data-v="cierre">Cierre del día</button>
+      <button data-v="ajustes">Ajustes</button>
+      <a href="panel.html">Panel</a>
+      <button class="salir" onclick="cerrarSesion()">Salir</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- VENDER -->
+    <section class="vista on" id="vender">
+      <div class="catalogo">
+        <input class="buscar" id="buscar" type="search" placeholder="Buscar producto…">
+        <div class="chips" id="chips"></div>
+        <div class="tiles" id="tiles"></div>
+      </div>
+      <aside class="carrito">
+        <div class="carrito-h"><b>Orden actual</b><button class="link" id="limpiar">Limpiar</button></div>
+        <div class="lineas" id="lineas"></div>
+        <div class="totales" id="totales"></div>
+      </aside>
+    </section>
+
+    <!-- HOY -->
+    <section class="vista" id="hoy">
+      <h2>Ventas de hoy</h2>
+      <p class="sub" id="hoyRes"></p>
+      <div id="hoyLista"></div>
+    </section>
+
+    <!-- CIERRE -->
+    <section class="vista" id="cierre">
+      <h2>Cierre del día</h2>
+      <div class="fila" style="margin-bottom:14px">
+        <input type="date" id="cDia" class="buscar" style="width:auto;margin:0">
+        <button class="b b-sec" id="cCopiar">Copiar resumen</button>
+        <button class="b b-sec" id="cWa">Enviar por WhatsApp</button>
+        <button class="b b-pri" id="cCsv">Descargar CSV</button>
+      </div>
+      <div id="cierreBox"></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section class="vista" id="ajustes">
+      <h2>Ajustes de la caja</h2>
+      <p class="sub">Se guardan en este equipo.</p>
+      <div class="caja">
+        <h3>IVU</h3>
+        <div class="fila">
+          <label class="campo">IVU estatal (%)<input type="number" step="0.1" id="aEst"></label>
+          <label class="campo">IVU municipal (%)<input type="number" step="0.1" id="aMun"></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="aInc"> Los precios ya incluyen IVU</label>
+        <p class="sub" style="margin-top:8px;font-size:13px">Verifica con tu contador la tasa que te aplica. Por defecto: 6% estatal + 1% municipal (alimentos preparados).</p>
+      </div>
+      <div class="caja">
+        <h3>Recibo</h3>
+        <label class="campo">Nombre del negocio<input id="aNeg"></label>
+        <label class="campo">Teléfono<input id="aTel"></label>
+        <label class="campo">Lugar / evento de hoy<input id="aLug" placeholder="Ej. Mercado de Condado"></label>
+        <label class="campo">Mensaje de gracias<input id="aGra"></label>
+        <button class="b b-pri" id="aGuardar">Guardar ajustes</button>
+      </div>
+      <div class="caja">
+        <h3>Respaldo de ventas</h3>
+        <p class="sub" style="font-size:14px">Las ventas viven en este equipo. Descarga un respaldo cada semana.</p>
+        <div class="fila">
+          <button class="b b-sec" id="rExp">Descargar respaldo</button>
+          <label class="b b-sec">Restaurar respaldo<input type="file" id="rImp" accept=".json" hidden></label>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="barra" id="barra">
+    <div class="info"><span id="mCant">0 artículos · ver orden</span><b id="mTot">$0.00</b></div>
+    <button id="mCobrar">Cobrar</button>
+  </div>
+</div>
+
+<!-- Orden (móvil) -->
+<div class="ov" id="ovOrden"><div class="hoja">
+  <div class="fila" style="justify-content:space-between"><h3>Orden actual</h3><button class="link" id="limpiarM">Limpiar</button></div>
+  <div id="lineasM"></div><div class="totales" id="totalesM" style="padding:12px 0 0"></div>
+  <button class="b b-sec" style="width:100%;justify-content:center;margin-top:8px" data-cerrar="ovOrden">Seguir vendiendo</button>
+</div></div>
+
+<!-- Cobro -->
+<div class="ov" id="ovPago"><div class="hoja" id="pagoHoja"></div></div>
+
+<!-- Recibo -->
+<div class="ov" id="ovRecibo"><div class="hoja" id="reciboHoja"></div></div>
+
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/admin-comun.js"></script>
+<script src="assets/js/pos.js"></script>
+</body>
+</html>
