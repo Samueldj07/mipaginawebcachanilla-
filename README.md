@@ -28,8 +28,7 @@ En `assets/js/catalogo.js`:
 
 En `assets/js/auth.js`: **cambiar la contraseña temporal** (Panel → Seguridad te genera la línea).
 
-- Usuario temporal: `cachanilla`
-- Contraseña temporal: `Talavera#2026`
+El usuario y la contraseña temporales se entregaron a los dueños por privado (no se escriben aquí porque el repositorio es público).
 
 ## Fotos y video (espacios listos)
 Sube las fotos con estos nombres y aparecen solas:

@@ -11,7 +11,7 @@
    nueva para pegar aquí abajo.
    ===================================================================== */
 const USUARIOS = [
-  // usuario: cachanilla · contraseña temporal: Talavera#2026  (¡cámbiala!)
+  // Usuario y contraseña temporales: los tienen los dueños. ¡Cámbialos en Panel → Seguridad!
   { usuario: 'cachanilla', hash: '923b8ad1f573fb1aa1cf1b1464eacaa41b94738f6e89d7acdebb3d206d401d5a' },
 ];
 
