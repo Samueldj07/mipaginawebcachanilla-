@@ -14,8 +14,8 @@ window.CACHANILLA = {
     nombre: "La Cachanilla",
     lema: "Panadería mexicana · hecha a mano en Puerto Rico",
     // Número de WhatsApp para recibir pedidos: código de país + número, sin espacios ni guiones.
-    // 1 + 787 + número.  ⚠️ CAMBIAR por el número real.
-    whatsapp: "17870000000",
+    // 1 + 939 + número.
+    whatsapp: "19392540736",
     instagram: "lacachanilla.mxdulce",          // ⚠️ Confirmar el usuario exacto de Instagram
     correo: "",
     zona: "San Juan, Puerto Rico",
