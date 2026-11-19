@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menú · La Cachanilla Panadería Mexicana</title>
+<meta name="description" content="Menú de La Cachanilla: conchas, marranitos, bisquets, teleras, besos, budín, champurrado y agua de jamaica.">
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body data-page="menu">
+<div id="site-header"></div>
+<main>
+  <div class="cabeza"><h1>Nuestro menú</h1><p>Pan dulce, pan salado y bebidas de la tradición mexicana.</p></div>
+  <section>
+    <div class="wrap">
+      <div class="filtros" id="filtros"></div>
+      <div class="grid" id="lista"></div>
+      <p class="nota" style="text-align:center;margin-top:30px">Precios no incluyen IVU. Lo marcado “Esta semana” se puede pedir en línea.</p>
+      <p style="text-align:center"><a class="btn btn-rosa" href="pedidos.html">Hacer pedido</a></p>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/site.js"></script>
+<script>
+  const P = window.CACHANILLA.productos;
+  const cats = ['Todo', ...new Set(P.map(p => p.cat))];
+  let actual = 'Todo';
+  function pintar() {
+    $('#filtros').innerHTML = cats.map(c => `<button class="${c === actual ? 'on' : ''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
+    $('#lista').innerHTML = P.filter(p => actual === 'Todo' || p.cat === actual).map(p => `
+      <article class="card rev">
+        <div class="img">${fotoProducto(p)}${p.disponible ? '<span class="tag" style="background:var(--hoja)">Esta semana</span>' : '<span class="tag" style="background:var(--gris)">No disponible</span>'}</div>
+        <div class="body"><h3>${esc(p.nombre)}</h3><p>${esc(p.desc)}</p><div class="precio">${money(p.precio)}</div></div>
+      </article>`).join('');
+    revelar();
+  }
+  $('#filtros').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { actual = b.dataset.c; pintar(); } });
+  pintar();
+</script>
+</body>
+</html>

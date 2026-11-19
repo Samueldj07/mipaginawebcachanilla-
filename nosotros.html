@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nosotros · La Cachanilla Panadería Mexicana</title>
+<meta name="description" content="La historia de La Cachanilla: panadería mexicana artesanal en San Juan, Puerto Rico.">
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script>window.phFoto=function(i){(window._phq=window._phq||[]).push(i)}</script>
+<style>
+  .historia{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+  .marco{border-radius:24px;padding:16px;background:url(assets/img/talavera.svg) center/80px;box-shadow:var(--sombra)}
+  .marco .in{aspect-ratio:4/5;border-radius:16px;overflow:hidden;background:var(--papel)}
+  .marco img{width:100%;height:100%;object-fit:cover}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+  .galeria .g{aspect-ratio:1;border-radius:16px;overflow:hidden;background:url(assets/img/talavera.svg) center/60px;border:4px solid #fff;box-shadow:var(--sombra)}
+  .galeria img{width:100%;height:100%;object-fit:cover}
+  @media (max-width:820px){ .historia{grid-template-columns:1fr} }
+</style>
+</head>
+<body data-page="nosotros">
+<div id="site-header"></div>
+<main>
+  <div class="cabeza"><h1>Nuestra historia</h1><p>Una panadería mexicana con corazón boricua.</p></div>
+
+  <section>
+    <div class="wrap historia">
+      <div class="marco rev"><div class="in"><img src="assets/img/nosotros.jpg" alt="El equipo de La Cachanilla" data-n="Foto del equipo" onerror="phFoto(this)"></div></div>
+      <div class="rev">
+        <div class="cenefa" style="width:120px;height:12px;border-radius:6px;background:repeating-linear-gradient(90deg,var(--cobalto) 0 12px,var(--amarillo) 12px 18px,var(--rosa) 18px 30px,var(--amarillo) 30px 36px);margin-bottom:14px"></div>
+        <h2 style="font-size:40px">Del horno de México a las calles de San Juan</h2>
+        <!-- ✏️ Edita este texto con la historia real del negocio -->
+        <p>La Cachanilla nació de las ganas de compartir el pan de nuestra tierra: la concha de la mañana, el marranito de piloncillo de la abuela y el agua de jamaica bien fría.</p>
+        <p>Hoy horneamos en tandas pequeñas y llevamos el pan a mercados y eventos de San Juan, con la meta de abrir pronto nuestro propio punto fijo.</p>
+        <p><b>Nuestra promesa:</b> pan hecho a mano, ingredientes de verdad y el sabor de la panadería de barrio mexicana.</p>
+        <a class="btn btn-rosa" href="pedidos.html">Prueba nuestro pan</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-azulejo">
+    <div class="wrap">
+      <div class="titulo rev"><div class="cenefa"></div><h2>Galería</h2><p>Sube tus fotos a <code>assets/img/galeria/</code> con los nombres 1.jpg, 2.jpg … 8.jpg.</p></div>
+      <div class="galeria" id="galeria"></div>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/site.js"></script>
+<script>
+  $('#galeria').innerHTML = Array.from({ length: 8 }, (_, i) =>
+    `<div class="g rev"><img src="assets/img/galeria/${i + 1}.jpg" alt="Foto ${i + 1} de La Cachanilla" loading="lazy" data-n="Foto ${i + 1}" onerror="phFoto(this)"></div>`).join('');
+  revelar();
+</script>
+</body>
+</html>

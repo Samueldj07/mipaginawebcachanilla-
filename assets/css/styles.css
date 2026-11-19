@@ -1,0 +1,189 @@
+/* =========================================================
+   La Cachanilla · Estilos del sitio (concepto Talavera)
+   ========================================================= */
+:root{
+  --cobalto:#1d3f9a; --cobalto-o:#12286b; --cielo:#dfe7fb;
+  --amarillo:#f2b705; --naranja:#e2572b; --rosa:#c2366f; --rosa-l:#fde4ee;
+  --verde:#1f4d3a; --hoja:#2f8f5b; --crema:#fbf6ec; --papel:#fffdf8;
+  --tinta:#231d19; --gris:#6f645b; --linea:#ecdcc4;
+  --radio:18px; --sombra:0 10px 30px rgba(18,40,107,.12);
+  --f-logo:'Lobster',cursive; --f-tit:'Fraunces',Georgia,serif; --f-txt:'Poppins',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--f-txt);color:var(--tinta);background:var(--crema);line-height:1.6;font-size:16px}
+img{max-width:100%;display:block}
+a{color:var(--cobalto)}
+h1,h2,h3{font-family:var(--f-tit);line-height:1.15;margin:0 0 .4em;color:var(--cobalto-o)}
+.wrap{width:min(1180px,92%);margin-inline:auto}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- Papel picado ---------- */
+.papel{display:flex;height:34px;overflow:hidden;position:relative;z-index:2}
+.papel span{flex:1;min-width:38px;clip-path:polygon(0 0,100% 0,100% 70%,85% 100%,70% 70%,50% 100%,30% 70%,15% 100%,0 70%);
+  -webkit-mask:radial-gradient(circle at 50% 38%,transparent 4px,#000 5px);mask:radial-gradient(circle at 50% 38%,transparent 4px,#000 5px)}
+.papel span:nth-child(5n+1){background:var(--rosa)} .papel span:nth-child(5n+2){background:var(--amarillo)}
+.papel span:nth-child(5n+3){background:var(--cobalto)} .papel span:nth-child(5n+4){background:var(--hoja)}
+.papel span:nth-child(5n+5){background:var(--naranja)}
+.papel::before{content:"";position:absolute;left:0;right:0;top:3px;height:2px;background:rgba(0,0,0,.25)}
+
+/* ---------- Cabecera ---------- */
+.top{position:sticky;top:0;z-index:50;background:var(--papel);box-shadow:0 2px 0 var(--linea)}
+.nav{display:flex;align-items:center;gap:18px;padding:10px 0}
+.logo{font-family:var(--f-logo);font-size:32px;color:var(--rosa);text-decoration:none;line-height:1;display:flex;align-items:center;gap:10px}
+.logo i{width:38px;height:38px;border-radius:10px;background:url(../img/talavera.svg) center/38px;box-shadow:0 0 0 2px var(--cobalto);flex:none}
+.logo small{display:block;font-family:var(--f-txt);font-size:10px;letter-spacing:2px;color:var(--cobalto);text-transform:uppercase;margin-top:3px}
+.menu{display:flex;gap:4px;margin-left:auto;list-style:none;padding:0;margin-block:0}
+.menu a{display:block;padding:9px 14px;border-radius:999px;text-decoration:none;color:var(--tinta);font-weight:600;font-size:15px}
+.menu a:hover{background:var(--cielo)}
+.menu a.on{background:var(--cobalto);color:#fff}
+.menu a.cta{background:var(--rosa);color:#fff}
+.menu a.cta:hover{background:#a52a5c}
+.burger{display:none;margin-left:auto;background:var(--cobalto);color:#fff;border:0;border-radius:12px;width:46px;height:46px;font-size:22px;cursor:pointer}
+@media (max-width:880px){
+  .burger{display:block}
+  .menu{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;background:var(--papel);padding:10px 4%;box-shadow:0 12px 20px rgba(0,0,0,.08)}
+  .menu.open{display:flex}
+  .menu a{padding:13px 16px}
+}
+
+/* ---------- Botones ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:999px;font-weight:700;text-decoration:none;border:0;cursor:pointer;font-family:inherit;font-size:16px;transition:transform .15s, box-shadow .15s}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--sombra)}
+.btn-rosa{background:var(--rosa);color:#fff}
+.btn-azul{background:var(--cobalto);color:#fff}
+.btn-blanco{background:#fff;color:var(--cobalto)}
+.btn-borde{background:transparent;color:var(--cobalto);box-shadow:inset 0 0 0 2px var(--cobalto)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;background:var(--cobalto-o);color:#fff;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:url(../img/talavera.svg) 0 0/120px;opacity:.16}
+.hero .wrap{position:relative;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:70px 0 90px}
+.hero h1{font-family:var(--f-logo);font-weight:400;color:#fff;font-size:clamp(54px,9vw,104px);margin:0;text-shadow:4px 4px 0 var(--rosa)}
+.hero .kicker{display:inline-block;background:var(--amarillo);color:var(--cobalto-o);font-weight:700;padding:6px 14px;border-radius:999px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase}
+.hero p.lead{font-size:20px;max-width:520px;opacity:.95;margin:14px 0 28px}
+.hero .btns{display:flex;gap:12px;flex-wrap:wrap}
+.plato{position:relative;aspect-ratio:1;border-radius:50%;padding:22px;background:url(../img/talavera.svg) center/90px;box-shadow:0 0 0 8px var(--amarillo),0 0 0 16px var(--rosa),0 30px 60px rgba(0,0,0,.35);max-width:460px;margin-inline:auto;width:100%}
+.plato .foto{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--papel);box-shadow:inset 0 0 0 6px var(--cobalto)}
+.plato .foto img{width:100%;height:100%;object-fit:cover}
+.sello{position:absolute;right:-6px;bottom:30px;background:var(--rosa);color:#fff;border-radius:50%;width:118px;height:118px;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--f-logo);font-size:21px;line-height:1.05;transform:rotate(-12deg);box-shadow:0 0 0 5px #fff;padding:10px}
+.ola{display:block;width:100%;height:50px;margin-top:-49px;position:relative}
+@media (max-width:880px){ .hero .wrap{grid-template-columns:1fr;padding:40px 0 70px;text-align:center} .hero p.lead{margin-inline:auto} .hero .btns{justify-content:center} .plato{max-width:320px} .sello{width:96px;height:96px;font-size:17px} }
+
+/* ---------- Secciones ---------- */
+section{padding:72px 0}
+.titulo{text-align:center;margin-bottom:40px}
+.titulo h2{font-size:clamp(32px,5vw,48px)}
+.titulo p{color:var(--gris);max-width:620px;margin:0 auto}
+.titulo .cenefa{width:160px;height:14px;margin:0 auto 14px;background:repeating-linear-gradient(90deg,var(--cobalto) 0 14px,var(--amarillo) 14px 20px,var(--rosa) 20px 34px,var(--amarillo) 34px 40px);border-radius:7px}
+.bg-azulejo{position:relative;background:var(--cielo)}
+.bg-azulejo::before{content:"";position:absolute;inset:0;background:url(../img/talavera.svg) 0 0/90px;opacity:.12;pointer-events:none}
+.bg-azulejo > *{position:relative}
+.bg-rosa{background:var(--rosa-l)}
+
+/* ---------- Tarjetas de producto ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+.card{background:var(--papel);border-radius:var(--radio);overflow:hidden;box-shadow:var(--sombra);display:flex;flex-direction:column;border:3px solid #fff;transition:transform .2s}
+.card:hover{transform:translateY(-4px)}
+.card .img{position:relative;aspect-ratio:4/3;background:url(../img/talavera.svg) center/70px;border-bottom:5px solid var(--amarillo)}
+.card .img img{width:100%;height:100%;object-fit:cover}
+.card .tag{position:absolute;top:12px;left:12px;background:var(--cobalto);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+.card .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1}
+.card h3{font-size:20px;margin-bottom:4px}
+.card p{color:var(--gris);font-size:14px;margin:0 0 12px;flex:1}
+.card .precio{font-family:var(--f-tit);font-weight:800;color:var(--rosa);font-size:24px}
+.ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(255,253,248,.82);color:var(--cobalto);font-weight:700;font-size:13px;text-align:center;padding:10px}
+.ph b{font-family:var(--f-logo);font-weight:400;font-size:22px;color:var(--rosa)}
+
+/* ---------- Valores ---------- */
+.valores{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:22px}
+.valor{background:var(--papel);border-radius:var(--radio);padding:28px;text-align:center;box-shadow:var(--sombra);border-top:8px solid var(--cobalto)}
+.valor:nth-child(2){border-top-color:var(--rosa)} .valor:nth-child(3){border-top-color:var(--amarillo)}
+.valor .ico{width:74px;height:74px;margin:0 auto 14px;border-radius:50%;background:url(../img/talavera.svg) center/74px;display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 0 0 4px #fff,0 0 0 7px var(--cobalto)}
+.valor h3{font-size:22px}
+.valor p{color:var(--gris);margin:0}
+
+/* ---------- Banda CTA ---------- */
+.banda{background:var(--rosa);color:#fff;text-align:center;position:relative;overflow:hidden}
+.banda::before{content:"";position:absolute;inset:0;background:url(../img/talavera.svg) 0 0/120px;opacity:.1}
+.banda > *{position:relative}
+.banda h2{color:#fff;font-family:var(--f-logo);font-weight:400;font-size:clamp(36px,6vw,58px)}
+
+/* ---------- Eventos ---------- */
+.eventos{display:grid;gap:14px;max-width:760px;margin:auto}
+.evento{display:flex;gap:18px;align-items:center;background:var(--papel);border-radius:var(--radio);padding:16px 20px;box-shadow:var(--sombra)}
+.evento .f{background:var(--cobalto);color:#fff;font-weight:700;border-radius:12px;padding:10px 14px;min-width:120px;text-align:center}
+.evento b{display:block}
+.evento small{color:var(--gris)}
+
+/* ---------- Instagram / video ---------- */
+.reels{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px;align-items:start}
+.reel-ph{aspect-ratio:9/16;max-height:560px;border-radius:var(--radio);background:url(../img/talavera.svg) center/80px;display:flex;align-items:center;justify-content:center;box-shadow:var(--sombra);border:4px solid #fff}
+.reel-ph div{background:rgba(255,253,248,.92);border-radius:14px;padding:18px;text-align:center;max-width:80%;color:var(--cobalto);font-weight:600;font-size:14px}
+.reel-ph div b{display:block;font-family:var(--f-logo);font-weight:400;font-size:26px;color:var(--rosa)}
+.video-box{border-radius:var(--radio);overflow:hidden;box-shadow:0 0 0 6px var(--amarillo),var(--sombra);background:#000}
+.video-box video{width:100%;display:block}
+.instagram-media{margin:0 auto !important;min-width:0 !important}
+
+/* ---------- Pie ---------- */
+footer{background:var(--cobalto-o);color:#dfe7fb;padding:50px 0 24px;position:relative}
+footer::before{content:"";position:absolute;left:0;right:0;top:0;height:16px;background:url(../img/talavera.svg) 0 0/16px}
+footer .cols{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px}
+footer a{color:#fff}
+footer h4{color:var(--amarillo);margin:0 0 8px;font-size:15px;letter-spacing:1px;text-transform:uppercase}
+footer ul{list-style:none;padding:0;margin:0;line-height:2}
+footer .logo{color:#fff}
+footer .copy{border-top:1px solid rgba(255,255,255,.15);margin-top:30px;padding-top:16px;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+@media (max-width:760px){ footer .cols{grid-template-columns:1fr} }
+
+/* ---------- Página interior ---------- */
+.cabeza{background:var(--cobalto);color:#fff;text-align:center;padding:56px 0 64px;position:relative;overflow:hidden}
+.cabeza::before{content:"";position:absolute;inset:0;background:url(../img/talavera.svg) 0 0/100px;opacity:.14}
+.cabeza > *{position:relative}
+.cabeza h1{color:#fff;font-family:var(--f-logo);font-weight:400;font-size:clamp(44px,7vw,72px);margin:0;text-shadow:3px 3px 0 var(--rosa)}
+.cabeza p{margin:6px auto 0;max-width:620px;opacity:.92}
+.filtros{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px}
+.filtros button{border:0;background:#fff;padding:9px 18px;border-radius:999px;font-weight:600;font-family:inherit;cursor:pointer;color:var(--cobalto);box-shadow:inset 0 0 0 2px var(--cielo)}
+.filtros button.on{background:var(--cobalto);color:#fff}
+
+/* ---------- Pedidos ---------- */
+.pedido-layout{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:start}
+.qty{display:flex;align-items:center;gap:8px;margin-top:10px}
+.qty button{width:40px;height:40px;border-radius:12px;border:0;font-size:22px;font-weight:800;cursor:pointer;background:var(--cielo);color:var(--cobalto)}
+.qty button.mas{background:var(--rosa);color:#fff}
+.qty output{min-width:28px;text-align:center;font-weight:800;font-size:18px}
+.card.sel{border-color:var(--rosa)}
+.resumen{position:sticky;top:90px;background:var(--papel);border-radius:var(--radio);box-shadow:var(--sombra);padding:22px;border-top:8px solid var(--rosa)}
+.resumen h3{font-size:24px}
+.lin{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px dashed var(--linea);font-size:15px}
+.tot{display:flex;justify-content:space-between;font-weight:800;font-size:22px;color:var(--cobalto-o);margin:12px 0 4px}
+.form label{display:block;font-weight:600;font-size:14px;margin:12px 0 4px}
+.form input,.form textarea,.form select{width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--linea);font-family:inherit;font-size:16px;background:#fff}
+.form input:focus,.form textarea:focus,.form select:focus{outline:none;border-color:var(--cobalto)}
+.nota{font-size:13px;color:var(--gris)}
+.barra-movil{display:none}
+@media (max-width:960px){
+  .pedido-layout{grid-template-columns:1fr}
+  .resumen{position:static}
+  .barra-movil{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:40;background:var(--cobalto);color:#fff;border-radius:16px;padding:12px 16px;align-items:center;gap:12px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .barra-movil b{flex:1}
+}
+
+/* ---------- Acceso ---------- */
+.acceso{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--cobalto-o);position:relative;padding:20px}
+.acceso::before{content:"";position:absolute;inset:0;background:url(../img/talavera.svg) 0 0/120px;opacity:.2}
+.caja-login{position:relative;background:var(--papel);border-radius:24px;padding:36px 32px;width:min(420px,100%);box-shadow:0 0 0 8px var(--amarillo),0 30px 60px rgba(0,0,0,.4)}
+.caja-login .logo{justify-content:center;margin-bottom:6px}
+.error{background:#fbe4e2;color:#b3261e;border-radius:10px;padding:10px 12px;font-size:14px;margin-top:12px;display:none}
+.error.on{display:block}
+
+/* ---------- Toast ---------- */
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:var(--verde);color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;z-index:200;transition:transform .25s;max-width:90%}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.toast.err{background:#b3261e}
+
+/* ---------- Animación de entrada ---------- */
+.rev{opacity:0;transform:translateY(24px);transition:opacity .6s, transform .6s}
+.rev.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){ .rev{opacity:1;transform:none} html{scroll-behavior:auto} }

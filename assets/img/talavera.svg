@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" fill="#fbf6ec"/>
+  <!-- esquinas -->
+  <g fill="#1d3f9a">
+    <circle cx="0" cy="0" r="30"/><circle cx="120" cy="0" r="30"/>
+    <circle cx="0" cy="120" r="30"/><circle cx="120" cy="120" r="30"/>
+  </g>
+  <g fill="#f2b705">
+    <circle cx="0" cy="0" r="19"/><circle cx="120" cy="0" r="19"/>
+    <circle cx="0" cy="120" r="19"/><circle cx="120" cy="120" r="19"/>
+  </g>
+  <g fill="#e2572b">
+    <circle cx="0" cy="0" r="9"/><circle cx="120" cy="0" r="9"/>
+    <circle cx="0" cy="120" r="9"/><circle cx="120" cy="120" r="9"/>
+  </g>
+  <!-- hojas diagonales -->
+  <g fill="#2f8f5b">
+    <ellipse cx="32" cy="32" rx="9" ry="4" transform="rotate(45 32 32)"/>
+    <ellipse cx="88" cy="32" rx="9" ry="4" transform="rotate(-45 88 32)"/>
+    <ellipse cx="32" cy="88" rx="9" ry="4" transform="rotate(-45 32 88)"/>
+    <ellipse cx="88" cy="88" rx="9" ry="4" transform="rotate(45 88 88)"/>
+  </g>
+  <!-- flor central -->
+  <g fill="#1d3f9a" transform="translate(60 60)">
+    <ellipse rx="8" ry="22" />
+    <ellipse rx="8" ry="22" transform="rotate(45)"/>
+    <ellipse rx="8" ry="22" transform="rotate(90)"/>
+    <ellipse rx="8" ry="22" transform="rotate(135)"/>
+  </g>
+  <g fill="#fbf6ec" transform="translate(60 60)">
+    <ellipse rx="3" ry="13" />
+    <ellipse rx="3" ry="13" transform="rotate(45)"/>
+    <ellipse rx="3" ry="13" transform="rotate(90)"/>
+    <ellipse rx="3" ry="13" transform="rotate(135)"/>
+  </g>
+  <circle cx="60" cy="60" r="8" fill="#f2b705"/>
+  <circle cx="60" cy="60" r="3.5" fill="#c2366f"/>
+  <!-- puntos -->
+  <g fill="#1d3f9a">
+    <circle cx="60" cy="8" r="3"/><circle cx="60" cy="112" r="3"/>
+    <circle cx="8" cy="60" r="3"/><circle cx="112" cy="60" r="3"/>
+  </g>
+</svg>
