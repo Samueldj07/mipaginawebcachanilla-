@@ -141,7 +141,7 @@ function verRecibo(id, nueva) {
   const v = ventas().find(x => x.id === id); if (!v) return;
   $('#reciboHoja').innerHTML = `
     <div class="recibo ${v.anulada ? 'anulada' : ''}" id="reciboImp">
-      <div class="cab"><b>${esc(cfg.negocio)}</b>${cfg.telefono ? esc(cfg.telefono) + '<br>' : ''}Recibo #${v.num} · ${fecha(v.ts)} ${hora(v.ts)}${v.lugar ? '<br>' + esc(v.lugar) : ''}${v.cliente ? '<br>Cliente: ' + esc(v.cliente) : ''}</div>
+      <div class="cab"><img class="logo-recibo" src="assets/img/marca/logo-horizontal.webp" alt="${esc(cfg.negocio)}" width="520" height="292">${cfg.telefono ? esc(cfg.telefono) + '<br>' : ''}Recibo #${v.num} · ${fecha(v.ts)} ${hora(v.ts)}${v.lugar ? '<br>' + esc(v.lugar) : ''}${v.cliente ? '<br>Cliente: ' + esc(v.cliente) : ''}</div>
       <div class="pagado">${v.anulada ? 'ANULADA' : 'PAGADO'}</div>
       ${v.lineas.map(l => `<div class="r"><span>${l.q} × ${esc(l.nombre)}</span><span>${money(l.precio * l.q)}</span></div>`).join('')}
       <div class="r" style="margin-top:8px"><span>Subtotal</span><span>${money(v.subtotal)}</span></div>

@@ -10,7 +10,7 @@
   window.esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   /* Foto del producto con espacio de reemplazo si aún no existe */
-  const ph = n => `<div class="ph"><b>${esc(n)}</b>📷 Foto próximamente</div>`;
+  const ph = n => `<div class="ph"><img src="assets/img/marca/logo-horizontal.webp" alt="" width="520" height="292"><b>${esc(n)}</b>📷 Foto próximamente</div>`;
   window.phFoto = img => { if (!img.isConnected) return; const d = document.createElement('div'); d.innerHTML = ph(img.dataset.n); img.replaceWith(d.firstElementChild); };
   (window._phq || []).forEach(phFoto); window._phq = [];
   window.fotoProducto = p => p.img
@@ -39,7 +39,7 @@
     <header class="top">
       ${papel}
       <nav class="wrap nav" aria-label="Principal">
-        <a class="logo" href="index.html"><i></i><span>${esc(N.nombre)}<small>Panadería mexicana</small></span></a>
+        <a class="logo" href="index.html" aria-label="La Cachanilla, inicio"><img src="assets/img/marca/logo-nombre.webp" alt="La Cachanilla" width="480" height="146"></a>
         <button class="burger" aria-label="Abrir menú" aria-expanded="false">☰</button>
         <ul class="menu">
           ${links.map(([h, t, k, c]) => `<li><a href="${h}" class="${pagina === k ? 'on' : ''} ${c || ''}">${t}</a></li>`).join('')}
@@ -58,7 +58,7 @@
       <div class="wrap">
         <div class="cols">
           <div>
-            <a class="logo" href="index.html"><i></i><span>${esc(N.nombre)}</span></a>
+            <a class="logo-pie" href="index.html"><img src="assets/img/marca/logo-completo.webp" alt="La Cachanilla" width="640" height="545" loading="lazy"></a>
             <p style="max-width:380px">${esc(N.lema)}. Pan dulce, pan salado y aguas frescas con recetas de México, horneados en ${esc(N.zona)}.</p>
           </div>
           <div>
