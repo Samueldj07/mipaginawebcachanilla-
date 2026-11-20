@@ -13,7 +13,8 @@ Sitio web de La Cachanilla con diseño inspirado en la talavera poblana, página
 | Videos de Instagram | `instagram.html` | Clientes |
 | Acceso | `acceso.html` | Equipo (correo o usuario + contraseña) |
 | Solicitar acceso | `registro.html` | Personal nuevo: la solicitud llega al WhatsApp y correo de los dueños |
-| Panel de dueños | `panel.html` | Dueños: resumen de ventas, catálogo de la semana, cuentas |
+| Panel de dueños | `panel.html` | Administradores: resumen de ventas y catálogo de la semana |
+| Administración | `admin.html` | Administradores: autorizar, invitar, equipo, conexión con GitHub |
 | Caja (POS) | `pos.html` | Dueños: cobrar, recibos, cierre del día, CSV |
 
 ## Publicar gratis con GitHub Pages
@@ -31,12 +32,14 @@ En Panel → Cuentas: **cambiar la contraseña temporal** y poner el correo prin
 
 El usuario y la contraseña temporales se entregaron a los dueños por privado (no se escriben aquí porque el repositorio es público).
 
-## Cuentas del equipo
-- **Alguien pide acceso:** entra a `registro.html` (enlace en la página de Acceso), llena sus datos y crea su contraseña. Con dos botones envía la solicitud al WhatsApp y al correo principal de los dueños. El mensaje trae un enlace de aprobación.
-- **El dueño aprueba:** toca el enlace → entra con su cuenta → *Aprobar* o *Rechazar* → avisa a la persona por WhatsApp y correo con un toque.
-- **El dueño crea una cuenta directamente:** Panel → Cuentas → *Crear cuenta*.
-- **Para activar los cambios:** Panel → Cuentas → *Descargar cuentas.js* → súbelo a GitHub en `assets/js/`.
-- Accesos: **Dueño/a** (panel + caja) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
+## Cuentas del equipo · `admin.html` (Administración)
+Solo los **Administradores/as** (dueños) entran. Cualquiera de ellos puede autorizar.
+
+- **Solicitud:** la persona entra a `registro.html`, crea su contraseña y envía la solicitud con un toque al WhatsApp y a los correos de los administradores (`lacachanillamx@outlook.com` y `spm.biokinet@gmail.com`). El mensaje trae un enlace: el administrador lo abre → **Aprobar**.
+- **Invitación:** Administración → *Invitar* → se envía un enlace por WhatsApp/correo; la persona crea su contraseña y devuelve la confirmación para aprobar.
+- **Publicación automática:** si el equipo del administrador está conectado a GitHub (Administración → *Conexión y avisos*, con un token que solo puede escribir en este repositorio), al aprobar la cuenta queda activa en 1–5 minutos sin subir archivos. Lo mismo para *Publicar en el sitio* del catálogo.
+- Sin conexión: descarga `cuentas.js` y súbelo a GitHub en `assets/js/`.
+- Accesos: **Administrador/a** (panel, administración y caja) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
 
 ## Fotos y video (espacios listos)
 Sube las fotos con estos nombres y aparecen solas:

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#12286b">
+<title>Administración · La Cachanilla</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/marca/icono-32.png">
+<link rel="apple-touch-icon" href="assets/img/marca/icono-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+<script src="assets/js/cuentas.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>requerirSesion('dueño');</script>
+<style>
+  .dos{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:860px){ .dos{grid-template-columns:1fr} }
+  .estado{display:flex;gap:12px;align-items:center;border-radius:14px;padding:14px 16px;margin-bottom:18px;font-size:14px}
+  .estado.ok{background:var(--ok-l);color:var(--verde)}
+  .estado.pend{background:#fff6dc;border-left:6px solid var(--amarillo)}
+  .estado b{display:block;font-size:15px}
+  .estado .sp{flex:1}
+  .pasos-ini{counter-reset:p;list-style:none;padding:0;margin:0}
+  .pasos-ini li{counter-increment:p;position:relative;padding:4px 0 10px 40px;font-size:14px}
+  .pasos-ini li::before{content:counter(p);position:absolute;left:0;top:2px;width:28px;height:28px;border-radius:50%;background:var(--cobalto);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .pasos-ini li.hecho::before{content:"✓";background:var(--hoja)}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:700}
+  .pill.adm{background:var(--rosa-l);color:var(--rosa)} .pill.caj{background:var(--cielo);color:var(--cobalto-o)}
+  .modal{position:fixed;inset:0;background:rgba(18,28,60,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:14px}
+  .modal.on{display:flex}
+  .modal .caja{max-width:460px;width:100%;margin:0;max-height:92vh;overflow:auto}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .col .b{justify-content:center}
+  .lista-x{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+  .lista-x span{background:var(--cielo);border-radius:999px;padding:5px 6px 5px 12px;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+  .lista-x button{background:#fff;border-radius:50%;width:22px;height:22px;color:var(--rojo);font-weight:800}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="adm-top">
+    <a class="marca" href="panel.html"><span class="pastilla"><img src="assets/img/marca/logo-nombre.webp" alt="La Cachanilla" width="480" height="146"></span><small>Administración</small></a>
+    <span class="sp"></span>
+    <nav class="tabs">
+      <button data-v="autorizar" class="on">Autorizar</button>
+      <button data-v="equipo">Equipo</button>
+      <button data-v="invitar">Invitar</button>
+      <button data-v="ajustes">Conexión y avisos</button>
+      <button data-v="micuenta">Mi cuenta</button>
+      <a href="panel.html">Panel</a>
+      <a href="pos.html">Caja</a>
+      <button class="salir" onclick="cerrarSesion()">Salir</button>
+    </nav>
+  </header>
+
+  <div class="contenido">
+    <div id="estadoPub"></div>
+
+    <!-- AUTORIZAR -->
+    <section class="vista on" id="autorizar">
+      <h2>Autorizar cuentas</h2>
+      <p class="sub">Cualquier administrador puede aprobar. Las solicitudes llegan por WhatsApp y a los correos de los administradores con un enlace: tócalo y aparece aquí.</p>
+      <div class="caja" id="solCaja" style="display:none;border-left:6px solid var(--rosa)"></div>
+      <div class="caja" id="sinSol">
+        <h3>No hay ninguna solicitud abierta</h3>
+        <p class="sub" style="font-size:14px;margin-bottom:8px">Abre el enlace que llegó por WhatsApp o correo. Si no abre, pégalo aquí:</p>
+        <div class="fila"><input id="cCodigo" class="campo" style="flex:1;margin:0;min-width:200px;padding:10px 12px;border:2px solid var(--linea);border-radius:10px" placeholder="https://…/admin.html#aprobar=…"><button class="b b-pri" id="cAbrir">Ver solicitud</button></div>
+      </div>
+      <div class="caja" id="primerosPasos">
+        <h3>Primeros pasos para los dueños</h3>
+        <ol class="pasos-ini" id="pasosIni"></ol>
+      </div>
+    </section>
+
+    <!-- EQUIPO -->
+    <section class="vista" id="equipo">
+      <h2>Equipo</h2>
+      <p class="sub"><span class="pill adm">Administrador/a</span> ve el panel, la caja y autoriza cuentas. <span class="pill caj">Cajero/a</span> solo usa la caja.</p>
+      <div class="caja"><div class="tabla"><table><thead><tr><th>Nombre</th><th>Correo / usuario</th><th>Acceso</th><th>Estado</th><th></th></tr></thead><tbody id="cFilas"></tbody></table></div></div>
+    </section>
+
+    <!-- INVITAR -->
+    <section class="vista" id="invitar">
+      <h2>Invitar a alguien</h2>
+      <p class="sub">La persona recibe un enlace, crea su propia contraseña y te devuelve la confirmación. Tú (o cualquier administrador) la aprueba con un toque.</p>
+      <div class="dos">
+        <div class="caja">
+          <h3>Enviar invitación (recomendado)</h3>
+          <label class="campo">Nombre<input id="iN"></label>
+          <label class="campo">Correo electrónico (será su usuario)<input id="iC" type="email" autocapitalize="none"></label>
+          <label class="campo">WhatsApp<input id="iW" type="tel" placeholder="787-000-0000"></label>
+          <label class="campo">Acceso<select id="iR"><option value="cajero">Cajero/a — solo caja</option><option value="dueño">Administrador/a (dueño) — panel y autoriza cuentas</option></select></label>
+          <button class="b b-pri" id="iCrear">Crear invitación</button>
+          <p class="sub" style="font-size:13px;margin:8px 0 0">La invitación vence en 7 días.</p>
+        </div>
+        <div class="caja">
+          <h3>Crear cuenta con contraseña temporal</h3>
+          <p class="sub" style="font-size:13px">Útil si la persona está contigo. Tendrás que darle la contraseña.</p>
+          <label class="campo">Nombre<input id="nN"></label>
+          <label class="campo">Correo<input id="nC" type="email" autocapitalize="none"></label>
+          <label class="campo">WhatsApp<input id="nW" type="tel" placeholder="787-000-0000"></label>
+          <label class="campo">Acceso<select id="nR"><option value="cajero">Cajero/a</option><option value="dueño">Administrador/a (dueño)</option></select></label>
+          <label class="campo">Contraseña temporal<span class="fila"><input id="nP" style="flex:1"><button class="b b-sec" id="nGen" type="button">Generar</button></span></label>
+          <button class="b b-sec" id="nCrear">Crear cuenta</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONEXIÓN Y AVISOS -->
+    <section class="vista" id="ajustes">
+      <h2>Conexión y avisos</h2>
+      <div class="dos">
+        <div class="caja">
+          <h3>Publicación automática (GitHub)</h3>
+          <p class="sub" style="font-size:14px">Con esto, al tocar <b>Aprobar</b> la cuenta se activa sola, sin subir archivos. Se configura una vez en cada celular o computadora de administrador.</p>
+          <div id="ghEstado" style="margin-bottom:10px"></div>
+          <label class="campo">Token de GitHub<input id="ghTok" type="password" autocomplete="off" placeholder="github_pat_…"></label>
+          <div class="fila"><button class="b b-pri" id="ghConectar">Conectar</button><button class="b b-rojo" id="ghQuitar">Desconectar este equipo</button></div>
+          <details style="margin-top:12px;font-size:14px"><summary style="cursor:pointer;font-weight:700">¿Cómo saco el token? (lo hace Samuel una vez)</summary>
+            <ol style="padding-left:18px;line-height:1.6">
+              <li>En GitHub abre <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+              <li><b>Token name:</b> “Cachanilla administración”. <b>Expiration:</b> 1 año.</li>
+              <li><b>Repository access:</b> <i>Only select repositories</i> → <code>mipaginawebcachanilla-</code>.</li>
+              <li><b>Permissions → Repository → Contents:</b> <i>Read and write</i>. Nada más.</li>
+              <li><b>Generate token</b>, cópialo y pégalo aquí. Para que otro administrador publique desde su celular, pégale el mismo token en su equipo.</li>
+            </ol>
+            Si pierdes un celular: en GitHub → Settings → Developer settings → Fine-grained tokens, bórralo y crea otro.
+          </details>
+        </div>
+        <div class="caja">
+          <h3>Dónde llegan las solicitudes</h3>
+          <label class="campo">WhatsApp de administradores</label>
+          <div class="lista-x" id="lWa"></div>
+          <div class="fila" style="margin-bottom:14px"><input id="aWa" type="tel" placeholder="787-000-0000" style="flex:1;padding:10px 12px;border:2px solid var(--linea);border-radius:10px"><button class="b b-sec" id="aWaAdd">Añadir</button></div>
+          <label class="campo">Correos de administradores</label>
+          <div class="lista-x" id="lMail"></div>
+          <div class="fila"><input id="aMail" type="email" autocapitalize="none" placeholder="correo@ejemplo.com" style="flex:1;padding:10px 12px;border:2px solid var(--linea);border-radius:10px"><button class="b b-sec" id="aMailAdd">Añadir</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MI CUENTA -->
+    <section class="vista" id="micuenta">
+      <h2>Mi cuenta</h2>
+      <div class="caja" style="max-width:520px">
+        <p class="sub" id="miCuenta"></p>
+        <label class="campo">Contraseña nueva (mínimo 10)<input id="sP1" type="password" autocomplete="new-password"></label>
+        <label class="campo">Repite la contraseña<input id="sP2" type="password" autocomplete="new-password"></label>
+        <button class="b b-pri" id="sGen">Cambiar mi contraseña</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- Aviso a la persona -->
+<div class="modal" id="ovAviso"><div class="caja">
+  <h3 id="avT"></h3>
+  <p class="sub" style="font-size:14px" id="avS"></p>
+  <div class="col">
+    <a class="b b-ok" id="avWa" target="_blank" rel="noopener">Avisar por WhatsApp</a>
+    <a class="b b-sec" id="avMail">Avisar por correo</a>
+    <button class="b b-sec" id="avCopiar">Copiar mensaje</button>
+    <button class="b b-sec" id="avCerrar">Cerrar</button>
+  </div>
+</div></div>
+
+<script src="assets/js/admin-comun.js"></script>
+<script src="assets/js/github.js"></script>
+<script src="assets/js/admin.js"></script>
+</body>
+</html>

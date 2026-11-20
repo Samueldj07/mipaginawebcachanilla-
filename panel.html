@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/css/admin.css">
 <script src="assets/js/cuentas.js"></script>
 <script src="assets/js/auth.js"></script>
-<script>requerirSesion('dueño');</script>
+<script>if (location.hash.startsWith('#aprobar=')) location.replace('admin.html' + location.hash); else requerirSesion('dueño');</script>
 <style>
   .barras{display:flex;gap:8px;align-items:flex-end;height:170px;padding-top:10px}
   .barras div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:11px;color:var(--gris)}
@@ -34,7 +34,7 @@
     <nav class="tabs">
       <button data-v="resumen" class="on">Resumen</button>
       <button data-v="catalogo">Catálogo de la semana</button>
-      <button data-v="cuentas">Cuentas</button>
+      <a href="admin.html">Administración</a>
       <a href="pos.html">Caja (POS)</a>
       <button class="salir" onclick="cerrarSesion()">Salir</button>
     </nav>
@@ -63,8 +63,8 @@
       <h2>Catálogo de la semana</h2>
       <p class="sub">Marca qué productos se pueden pedir esta semana, cuáles salen en la portada y ajusta precios.</p>
       <div class="aviso">
-        <b>Cómo publicar los cambios:</b> 1) Edita y pulsa <b>Guardar</b> (la caja de este equipo usa los precios nuevos al instante).
-        2) Pulsa <b>Descargar catalogo.js</b>. 3) En GitHub entra a <code>assets/js/</code> → <i>Add file → Upload files</i>, sube el archivo y pulsa <i>Commit</i>. En 1–2 minutos los clientes ven el catálogo nuevo.
+        <b>Cómo publicar los cambios:</b> edita y pulsa <b>Publicar en el sitio</b>: los clientes ven el catálogo nuevo en 1 a 5 minutos.
+        Si este equipo no está conectado a GitHub (Administración → Conexión y avisos), usa <b>Descargar catalogo.js</b> y súbelo a GitHub en <code>assets/js/</code>.
       </div>
       <div class="caja">
         <label class="campo">Título del catálogo<input id="tSemana"></label>
@@ -77,83 +77,19 @@
           <span style="flex:1"></span>
           <button class="b b-rojo" id="descartar">Volver al publicado</button>
           <button class="b b-pri" id="guardar">Guardar</button>
-          <button class="b b-rosa" id="bajar">Descargar catalogo.js</button>
+          <button class="b b-sec" id="bajar">Descargar catalogo.js</button>
+          <button class="b b-rosa" id="publicarCat">Publicar en el sitio</button>
         </div>
         <p class="sub" id="estado" style="margin:10px 0 0;font-size:13px"></p>
       </div>
     </section>
 
-    <!-- CUENTAS -->
-    <section class="vista" id="cuentas">
-      <h2>Cuentas</h2>
-      <p class="sub">Aprueba solicitudes, crea cuentas para tu equipo y cambia tu contraseña.</p>
-
-      <div class="aviso" id="pendienteAviso" style="display:none">
-        <b>Tienes cambios sin publicar.</b> Las cuentas nuevas o cambiadas se activan cuando subes el archivo:
-        pulsa <b>Descargar cuentas.js</b> → en GitHub entra a <code>assets/js/</code> → <i>Add file → Upload files</i> → <i>Commit</i>.
-        <div class="fila" style="margin-top:10px"><button class="b b-rosa" id="cBajar">Descargar cuentas.js</button><button class="b b-rojo" id="cDescartar">Descartar cambios</button></div>
-      </div>
-
-      <!-- Solicitud recibida -->
-      <div class="caja" id="solCaja" style="display:none;border-left:6px solid var(--rosa)"></div>
-
-      <div class="dos">
-        <div>
-          <div class="caja">
-            <h3>Cuentas del equipo</h3>
-            <div class="tabla"><table><thead><tr><th>Nombre</th><th>Correo / usuario</th><th>Acceso</th><th>Estado</th><th></th></tr></thead><tbody id="cFilas"></tbody></table></div>
-          </div>
-          <div class="caja">
-            <h3>¿Te llegó un código de solicitud?</h3>
-            <p class="sub" style="font-size:14px;margin-bottom:8px">Normalmente basta con tocar el enlace del WhatsApp o del correo. Si no abre, pega aquí el enlace completo.</p>
-            <div class="fila"><input id="cCodigo" class="buscar" style="flex:1;margin:0;min-width:200px" placeholder="https://…/panel.html#aprobar=…"><button class="b b-pri" id="cAbrir">Ver solicitud</button></div>
-          </div>
-        </div>
-        <div>
-          <div class="caja">
-            <h3>Crear cuenta</h3>
-            <label class="campo">Nombre<input id="nN"></label>
-            <label class="campo">Correo (será su usuario)<input id="nC" type="email" autocapitalize="none"></label>
-            <label class="campo">WhatsApp<input id="nW" type="tel" placeholder="787-000-0000"></label>
-            <label class="campo">Acceso<select id="nR"><option value="cajero">Cajero/a — solo caja</option><option value="dueño">Dueño/a — panel completo</option></select></label>
-            <label class="campo">Contraseña temporal<span class="fila"><input id="nP" style="flex:1"><button class="b b-sec" id="nGen" type="button">Generar</button></span></label>
-            <button class="b b-pri" id="nCrear">Crear cuenta</button>
-          </div>
-          <div class="caja">
-            <h3>Mi contraseña</h3>
-            <p class="sub" style="font-size:14px;margin-bottom:8px" id="miCuenta"></p>
-            <label class="campo">Contraseña nueva (mínimo 10)<input id="sP1" type="password" autocomplete="new-password"></label>
-            <label class="campo">Repite la contraseña<input id="sP2" type="password" autocomplete="new-password"></label>
-            <button class="b b-pri" id="sGen">Cambiar mi contraseña</button>
-          </div>
-          <div class="caja">
-            <h3>Dónde llegan las solicitudes</h3>
-            <label class="campo">WhatsApp de los dueños<input id="cfW" type="tel"></label>
-            <label class="campo">Correo principal de los dueños<input id="cfC" type="email" autocapitalize="none" placeholder="tucorreo@gmail.com"></label>
-            <button class="b b-sec" id="cfGuardar">Guardar</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- AVISO AL USUARIO -->
-    <div id="ovAviso" style="position:fixed;inset:0;background:rgba(18,28,60,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:14px">
-      <div class="caja" style="max-width:460px;width:100%;margin:0">
-        <h3 id="avT"></h3>
-        <p class="sub" style="font-size:14px" id="avS"></p>
-        <div class="fila" style="flex-direction:column;align-items:stretch">
-          <a class="b b-ok" id="avWa" target="_blank" rel="noopener" style="justify-content:center">Avisar por WhatsApp</a>
-          <a class="b b-sec" id="avMail" style="justify-content:center">Avisar por correo</a>
-          <button class="b b-rosa" id="avBajar" style="justify-content:center">Descargar cuentas.js</button>
-          <button class="b b-sec" id="avCerrar" style="justify-content:center">Cerrar</button>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 
 <script src="assets/js/catalogo.js"></script>
 <script src="assets/js/admin-comun.js"></script>
+<script src="assets/js/github.js"></script>
 <script>
   const s = sesionActual();
   const h = new Date().getHours();
@@ -181,6 +117,7 @@
   }
 
   /* ---------- Catálogo ---------- */
+  if (JSON.stringify(store.get('catalogo_borrador', null)) === JSON.stringify(window.CACHANILLA.productos)) store.del('catalogo_borrador');
   let lista = catalogoActivo();
   let semana = store.get('catalogo_semana', window.CACHANILLA.semana);
   const hayBorrador = () => !!store.get('catalogo_borrador', null);
@@ -225,163 +162,30 @@
     store.del('catalogo_borrador'); store.del('catalogo_semana');
     lista = catalogoActivo(); semana = window.CACHANILLA.semana; pintarCatalogo(); toast('Listo');
   };
-  $('#bajar').onclick = () => {
-    if (!validar()) return;
-    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana);
+  function textoCatalogo() {
     const datos = Object.assign({}, window.CACHANILLA, { semana, productos: lista });
-    const js = `/* =====================================================================
+    return `/* =====================================================================
    LA CACHANILLA · DATOS DEL NEGOCIO Y CATÁLOGO DE LA SEMANA
-   Generado desde el Panel de dueños el ${new Date().toLocaleString('es-PR')}.
-   Sube este archivo a GitHub en assets/js/ para publicarlo.
+   Actualizado desde el Panel de dueños el ${new Date().toLocaleString('es-PR')}${s ? ' por ' + s.nombre : ''}.
+   Para cambiarlo usa Panel → Catálogo de la semana.
    ===================================================================== */
 window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
 `;
-    descargar('catalogo.js', js, 'text/javascript;charset=utf-8');
+  }
+  $('#bajar').onclick = () => {
+    if (!validar()) return;
+    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana);
+    descargar('catalogo.js', textoCatalogo(), 'text/javascript;charset=utf-8');
     pintarCatalogo();
   };
-
-  /* ---------- Cuentas ---------- */
-  const PUB = window.CUENTAS;
-  let cuentas = store.get('cuentas_borrador', null) || JSON.parse(JSON.stringify(PUB));
-  const hayCambios = () => !!store.get('cuentas_borrador', null);
-  const guardarCuentas = () => { store.set('cuentas_borrador', cuentas); pintarCuentas(); };
-  const hoyISO = () => new Date().toISOString().slice(0, 10);
-  const dueñosActivos = () => cuentas.usuarios.filter(c => c.rol === 'dueño' && !c.inactiva).length;
-  const rolTxt = r => r === 'dueño' ? 'Dueño/a' : 'Cajero/a';
-  const telFmt = w => w ? '+' + w : '—';
-  let solicitud = null;
-
-  function pintarCuentas() {
-    $('#pendienteAviso').style.display = hayCambios() ? 'block' : 'none';
-    $('#miCuenta').textContent = 'Cuenta: ' + (s ? s.u : '');
-    $('#cfW').value = cuentas.whatsappDueno || ''; $('#cfC').value = cuentas.correoDueno || '';
-    $('#cFilas').innerHTML = cuentas.usuarios.map((c, i) => `
-      <tr style="${c.inactiva ? 'opacity:.5' : ''}">
-        <td><b>${esc(c.nombre || '')}</b><br><small style="color:var(--gris)">${telFmt(c.whatsapp)}</small></td>
-        <td>${esc(c.usuario)}</td>
-        <td><select data-rol="${i}" style="padding:6px;border-radius:8px;border:1.5px solid var(--linea)"><option value="cajero" ${c.rol !== 'dueño' ? 'selected' : ''}>Cajero/a</option><option value="dueño" ${c.rol === 'dueño' ? 'selected' : ''}>Dueño/a</option></select></td>
-        <td>${c.inactiva ? 'Desactivada' : 'Activa'}${PUB.usuarios.some(p => p.usuario === c.usuario) ? '' : '<br><small style="color:var(--rosa)">sin publicar</small>'}</td>
-        <td class="n" style="white-space:nowrap">
-          <button class="b b-sec" style="padding:6px 10px" data-act="${i}">${c.inactiva ? 'Activar' : 'Desactivar'}</button>
-          <button class="b b-rojo" style="padding:6px 10px" data-del="${i}" title="Eliminar">✕</button>
-        </td>
-      </tr>`).join('');
-  }
-  function proteger(i, accion) {
-    const c = cuentas.usuarios[i];
-    if (s && c.usuario === s.u && accion !== 'rol-dueño') { toast('No puedes quitarte el acceso a ti mismo', true); return false; }
-    if (c.rol === 'dueño' && !c.inactiva && dueñosActivos() <= 1) { toast('Debe quedar al menos un dueño activo', true); return false; }
-    return true;
-  }
-  $('#cFilas').addEventListener('change', e => {
-    const sel = e.target.closest('[data-rol]'); if (!sel) return;
-    const i = sel.dataset.rol;
-    if (sel.value === 'cajero' && !proteger(i)) { sel.value = 'dueño'; return; }
-    cuentas.usuarios[i].rol = sel.value; guardarCuentas(); toast('Acceso cambiado');
-  });
-  $('#cFilas').addEventListener('click', e => {
-    const a = e.target.closest('[data-act]'), d = e.target.closest('[data-del]');
-    if (a) { const c = cuentas.usuarios[a.dataset.act]; if (!c.inactiva && !proteger(a.dataset.act)) return; c.inactiva = !c.inactiva; if (!c.inactiva) delete c.inactiva; guardarCuentas(); }
-    if (d) { const c = cuentas.usuarios[d.dataset.del]; if (!proteger(d.dataset.del)) return;
-      if (confirm('¿Eliminar la cuenta de ' + (c.nombre || c.usuario) + '?')) { cuentas.usuarios.splice(d.dataset.del, 1); guardarCuentas(); } }
-  });
-
-  function descargarCuentas() {
-    store.set('cuentas_borrador', cuentas);
-    const js = `/* =====================================================================
-   LA CACHANILLA · CUENTAS DEL ÁREA PRIVADA
-   Generado desde el Panel de dueños el ${new Date().toLocaleString('es-PR')}.
-   No editar a mano: usa Panel → Cuentas y sube este archivo a assets/js/.
-   Las contraseñas NO se guardan, solo una huella (hash).
-   ===================================================================== */
-window.CUENTAS = ${JSON.stringify(cuentas, null, 2)};
-`;
-    descargar('cuentas.js', js, 'text/javascript;charset=utf-8');
-    toast('Ahora súbelo a GitHub en assets/js/');
-  }
-  $('#cBajar').onclick = descargarCuentas; $('#avBajar').onclick = descargarCuentas;
-  $('#cDescartar').onclick = () => { if (!confirm('¿Descartar los cambios de cuentas sin publicar?')) return; store.del('cuentas_borrador'); cuentas = JSON.parse(JSON.stringify(PUB)); pintarCuentas(); };
-  $('#cfGuardar').onclick = () => {
-    const c = $('#cfC').value.trim();
-    if (c && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)) return toast('Correo no válido', true);
-    cuentas.whatsappDueno = soloDigitosTel($('#cfW').value); cuentas.correoDueno = c; guardarCuentas(); toast('Guardado. Descarga cuentas.js para publicarlo');
-  };
-
-  /* Aviso al usuario por WhatsApp y correo */
-  function avisar(titulo, sub, persona, texto, asunto) {
-    $('#avT').textContent = titulo; $('#avS').textContent = sub;
-    const wa = $('#avWa'), ml = $('#avMail');
-    wa.style.display = persona.w ? '' : 'none'; wa.href = 'https://wa.me/' + persona.w + '?text=' + encodeURIComponent(texto);
-    ml.style.display = persona.c ? '' : 'none'; ml.href = 'mailto:' + persona.c + '?subject=' + encodeURIComponent(asunto) + '&body=' + encodeURIComponent(texto);
-    $('#avBajar').style.display = hayCambios() ? '' : 'none';
-    $('#ovAviso').style.display = 'flex';
-  }
-  $('#avCerrar').onclick = () => $('#ovAviso').style.display = 'none';
-
-  /* Solicitud */
-  function mostrarSolicitud(sol) {
-    solicitud = sol; const box = $('#solCaja');
-    if (!sol) { box.style.display = 'none'; return; }
-    const existe = cuentas.usuarios.some(c => normalizar(c.usuario) === normalizar(sol.c));
-    box.style.display = 'block';
-    box.innerHTML = `<h3>📩 Solicitud de cuenta</h3>
-      <table><tr><td>Nombre</td><td><b>${esc(sol.n)}</b></td></tr>
-      <tr><td>Correo</td><td>${esc(sol.c)}</td></tr><tr><td>WhatsApp</td><td>${telFmt(esc(sol.w))}</td></tr>
-      <tr><td>Pidió</td><td>${rolTxt(sol.r)}</td></tr>${sol.m ? `<tr><td>Mensaje</td><td>${esc(sol.m)}</td></tr>` : ''}
-      <tr><td>Enviada</td><td>${new Date(sol.t).toLocaleString('es-PR')}</td></tr></table>
-      ${existe ? '<p class="aviso" style="margin:12px 0 0">Ya existe una cuenta con este correo. Si la apruebas, se reemplaza su contraseña por la nueva.</p>' : ''}
-      <div class="fila" style="margin-top:14px">
-        <label class="campo" style="margin:0">Dar acceso como<select id="solRol"><option value="cajero" ${sol.r !== 'dueño' ? 'selected' : ''}>Cajero/a</option><option value="dueño" ${sol.r === 'dueño' ? 'selected' : ''}>Dueño/a</option></select></label>
-        <span style="flex:1"></span>
-        <button class="b b-rojo" id="solNo">Rechazar</button>
-        <button class="b b-ok" id="solSi">Aprobar</button>
-      </div>`;
-    $('#solSi').onclick = () => {
-      const rol = $('#solRol').value;
-      const i = cuentas.usuarios.findIndex(c => normalizar(c.usuario) === normalizar(sol.c));
-      const nueva = { usuario: normalizar(sol.c), nombre: sol.n, correo: normalizar(sol.c), whatsapp: sol.w, rol, alta: hoyISO(), hash: sol.h };
-      if (i >= 0) cuentas.usuarios[i] = Object.assign(cuentas.usuarios[i], nueva); else cuentas.usuarios.push(nueva);
-      guardarCuentas(); mostrarSolicitud(null); history.replaceState(null, '', 'panel.html');
-      avisar('✅ Cuenta aprobada', 'Descarga cuentas.js y súbelo a GitHub para activarla. Luego avísale:', { w: sol.w, c: sol.c },
-        `¡Hola ${sol.n}! 🎉 Tu cuenta de La Cachanilla fue aprobada como ${rolTxt(rol)}.\n\nEntra aquí con tu correo (${sol.c}) y la contraseña que creaste:\n${urlSitio()}acceso.html\n\nSi no te deja entrar todavía, espera unos minutos.`,
-        'Tu cuenta de La Cachanilla fue aprobada');
-    };
-    $('#solNo').onclick = () => {
-      mostrarSolicitud(null); history.replaceState(null, '', 'panel.html');
-      avisar('Solicitud rechazada', 'No se creó ninguna cuenta. Si quieres, avísale:', { w: sol.w, c: sol.c },
-        `Hola ${sol.n}. Por ahora no podemos aprobar tu solicitud de acceso a La Cachanilla. Si crees que es un error, escríbenos. ¡Gracias!`,
-        'Tu solicitud de acceso a La Cachanilla');
-    };
-    box.scrollIntoView({ behavior: 'smooth' });
-  }
-  $('#cAbrir').onclick = () => { const sol = decodificarSolicitud($('#cCodigo').value); if (!sol) return toast('El enlace o código no es válido', true); mostrarSolicitud(sol); };
-
-  /* Crear cuenta directamente */
-  const generarClave = () => { const a = 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789'; const r = crypto.getRandomValues(new Uint32Array(12)); return [...r].map(x => a[x % a.length]).join(''); };
-  $('#nGen').onclick = () => $('#nP').value = generarClave();
-  $('#nCrear').onclick = async () => {
-    const n = $('#nN').value.trim(), c = normalizar($('#nC').value), w = soloDigitosTel($('#nW').value), r = $('#nR').value, p = $('#nP').value;
-    if (!n) return toast('Escribe el nombre', true);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)) return toast('Correo no válido', true);
-    if (cuentas.usuarios.some(x => normalizar(x.usuario) === c)) return toast('Ya existe una cuenta con ese correo', true);
-    if (p.length < 10) return toast('La contraseña temporal debe tener al menos 10 caracteres', true);
-    cuentas.usuarios.push({ usuario: c, nombre: n, correo: c, whatsapp: w, rol: r, alta: hoyISO(), hash: await hashCredencial(c, p) });
-    guardarCuentas();
-    ['#nN', '#nC', '#nW', '#nP'].forEach(x => $(x).value = '');
-    avisar('✅ Cuenta creada', 'Descarga cuentas.js y súbelo a GitHub para activarla. Luego envíale sus datos:', { w, c },
-      `¡Hola ${n}! Te creamos una cuenta en La Cachanilla como ${rolTxt(r)}.\n\nEntra aquí: ${urlSitio()}acceso.html\nUsuario: ${c}\nContraseña temporal: ${p}\n\nPídele a un dueño que la cambie por una tuya.`,
-      'Tu cuenta de La Cachanilla');
-  };
-
-  /* Mi contraseña */
-  $('#sGen').onclick = async () => {
-    const p1 = $('#sP1').value, p2 = $('#sP2').value;
-    if (p1.length < 10) return toast('La contraseña debe tener al menos 10 caracteres', true);
-    if (p1 !== p2) return toast('Las contraseñas no coinciden', true);
-    const yo = cuentas.usuarios.find(c => c.usuario === s.u); if (!yo) return toast('No encontré tu cuenta', true);
-    yo.hash = await hashCredencial(yo.usuario, p1); guardarCuentas();
-    $('#sP1').value = $('#sP2').value = '';
-    toast('Listo. Descarga cuentas.js y súbelo a GitHub para que la nueva contraseña funcione');
+  $('#publicarCat').onclick = async () => {
+    if (!validar()) return;
+    if (!ghConectado()) { toast('Este equipo no está conectado a GitHub. Conéctalo en Administración → Conexión y avisos', true); return; }
+    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana);
+    const b = $('#publicarCat'); b.disabled = true; b.textContent = 'Publicando…';
+    try { await ghPublicar('assets/js/catalogo.js', textoCatalogo(), 'Actualizar catálogo de la semana'); toast('Publicado. Los clientes lo ven en 1 a 5 minutos'); }
+    catch (e) { toast('No se pudo publicar: ' + e.message, true); }
+    b.disabled = false; b.textContent = 'Publicar en el sitio';
   };
 
   /* ---------- Navegación ---------- */
@@ -390,15 +194,11 @@ window.CUENTAS = ${JSON.stringify(cuentas, null, 2)};
     $$('.vista').forEach(x => x.classList.toggle('on', x.id === v));
     if (v === 'resumen') pintarResumen();
     if (v === 'catalogo') pintarCatalogo();
-    if (v === 'cuentas') pintarCuentas();
     scrollTo(0, 0);
   }
   $$('.tabs button[data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));
   $$('[data-ir]').forEach(b => b.onclick = () => ir(b.dataset.ir));
-  const solURL = location.hash.startsWith('#aprobar=') ? decodificarSolicitud(location.hash) : null;
-  if (solURL) { ir('cuentas'); setTimeout(() => mostrarSolicitud(solURL), 50); }
-  else if (location.hash.startsWith('#aprobar=')) { ir('cuentas'); toast('El enlace de la solicitud está incompleto. Pídele que la envíe de nuevo.', true); }
-  else pintarResumen();
+  pintarResumen();
 </script>
 </body>
 </html>
