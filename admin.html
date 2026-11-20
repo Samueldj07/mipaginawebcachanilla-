@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/admin.css">
+<link rel="stylesheet" href="assets/css/comercios.css">
 <script src="assets/js/cuentas.js"></script>
 <script src="assets/js/auth.js"></script>
 <script>requerirSesion(['dueño', 'admin'], 'acceso-admin.html');</script>
@@ -45,6 +46,7 @@
     <span class="sp"></span>
     <nav class="tabs">
       <button data-v="autorizar" class="on">Autorizar</button>
+      <button data-v="comercios">Comercios <span id="badgeTab"></span></button>
       <button data-v="equipo">Equipo</button>
       <button data-v="invitar">Invitar</button>
       <button data-v="ajustes">Conexión y avisos</button>
@@ -141,6 +143,125 @@
       </div>
     </section>
 
+    <!-- COMERCIOS -->
+    <section class="vista" id="comercios">
+      <h2>Pedidos de comercios</h2>
+      <p class="sub">Pedidos a negocios, facturas, recibos de pago y recordatorios de cobro.</p>
+      <div id="syncEstado"></div>
+      <div class="chips-b2b">
+        <button data-sub="pedidos" class="on">Pedidos</button>
+        <button data-sub="nuevo">+ Nuevo pedido</button>
+        <button data-sub="recordatorios">Recordatorios de pago <span id="badgeRec"></span></button>
+        <button data-sub="clientes">Comercios</button>
+        <button data-sub="config">Datos de factura</button>
+      </div>
+
+      <!-- Lista de pedidos -->
+      <div class="sub-b2b on" id="b-pedidos">
+        <div class="kpis" id="b2bKpis"></div>
+        <div class="fila" style="margin-bottom:12px">
+          <input id="bBuscar" type="search" placeholder="Buscar comercio o número…" style="flex:1;min-width:200px;padding:10px 12px;border:2px solid var(--linea);border-radius:10px">
+          <select id="bFiltro" style="padding:10px 12px;border:2px solid var(--linea);border-radius:10px">
+            <option value="todos">Todos</option><option value="pendientes" selected>Por cobrar</option><option value="pagados">Pagados</option><option value="anulados">Anulados</option>
+          </select>
+        </div>
+        <div id="bLista"></div>
+      </div>
+
+      <!-- Nuevo / editar pedido -->
+      <div class="sub-b2b" id="b-nuevo">
+        <div class="caja">
+          <h3 id="pTitulo">Nuevo pedido de comercio</h3>
+          <div class="dos">
+            <div>
+              <label class="campo">Comercio<input id="pCliente" list="dlClientes" placeholder="Nombre del negocio" autocomplete="off"></label>
+              <datalist id="dlClientes"></datalist>
+              <div class="dos" style="gap:10px">
+                <label class="campo">Contacto<input id="pContacto" placeholder="Persona que recibe"></label>
+                <label class="campo">WhatsApp / teléfono<input id="pTel" type="tel" placeholder="787-000-0000"></label>
+              </div>
+              <label class="campo">Correo<input id="pCorreo" type="email" autocapitalize="none"></label>
+              <label class="campo">Dirección<input id="pDir"></label>
+            </div>
+            <div>
+              <div class="dos" style="gap:10px">
+                <label class="campo">Fecha del pedido<input id="pFecha" type="date"></label>
+                <label class="campo">Fecha de entrega<input id="pEntrega" type="date"></label>
+              </div>
+              <label class="campo">Términos de pago
+                <select id="pTerminos"><option value="0">Contado (al entregar)</option><option value="7">7 días</option><option value="15" selected>15 días</option><option value="30">30 días</option></select></label>
+              <label class="chk" style="margin:4px 0 10px"><input type="checkbox" id="pExento"> Exento de IVU (comercio revendedor con certificado)</label>
+              <label class="campo">Notas en la factura<textarea id="pNotas" rows="2" placeholder="Ej. Entregar antes de las 7:00 a.m."></textarea></label>
+            </div>
+          </div>
+          <h3 style="margin-top:8px">Productos</h3>
+          <div class="tabla"><table>
+            <thead><tr><th>Producto</th><th class="n">Cant.</th><th class="n">Precio</th><th class="n">Importe</th><th></th></tr></thead>
+            <tbody id="pLineas"></tbody>
+          </table></div>
+          <div class="fila" style="margin-top:10px">
+            <select id="pProducto" style="flex:1;min-width:200px;padding:10px 12px;border:2px solid var(--linea);border-radius:10px"></select>
+            <button class="b b-sec" id="pAgregar" type="button">+ Añadir</button>
+            <button class="b b-sec" id="pLibre" type="button">+ Línea libre</button>
+          </div>
+          <div id="pTotales" class="b2b-tot"></div>
+          <div class="fila" style="margin-top:14px">
+            <button class="b b-rojo" id="pCancelar" type="button">Cancelar</button>
+            <span style="flex:1"></span>
+            <button class="b b-pri" id="pGuardar" type="button">Guardar y crear factura</button>
+            <button class="b b-ok" id="pGuardarPagado" type="button">Guardar, ya pagó (recibo)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recordatorios -->
+      <div class="sub-b2b" id="b-recordatorios">
+        <div class="aviso">Facturas por cobrar ordenadas por vencimiento. Envía el recordatorio por WhatsApp o correo con un toque; queda anotado cuándo se envió.</div>
+        <div id="recLista"></div>
+      </div>
+
+      <!-- Clientes -->
+      <div class="sub-b2b" id="b-clientes">
+        <div class="caja"><h3>Comercios</h3><p class="sub" style="font-size:14px">Se guardan solos al crear pedidos. Aquí ves cuánto ha comprado y debe cada uno.</p><div id="cliLista"></div></div>
+      </div>
+
+      <!-- Configuración -->
+      <div class="sub-b2b" id="b-config">
+        <div class="dos">
+          <div class="caja">
+            <h3>Datos que salen en la factura</h3>
+            <label class="campo">Nombre legal del negocio<input id="fNombre"></label>
+            <label class="campo">Dirección<input id="fDir"></label>
+            <div class="dos" style="gap:10px">
+              <label class="campo">Teléfono<input id="fTel"></label>
+              <label class="campo">Correo<input id="fCorreo" type="email"></label>
+            </div>
+            <label class="campo">Núm. de Registro de Comerciante (Hacienda)<input id="fRegistro" placeholder="Opcional"></label>
+            <div class="dos" style="gap:10px">
+              <label class="campo">IVU (%)<input id="fIvu" type="number" step="0.1"></label>
+              <label class="campo">Cómo pagar (sale en la factura)<input id="fPago" placeholder="ATH Móvil 939-254-0736 / efectivo"></label>
+            </div>
+            <label class="campo">Mensaje al pie<input id="fPie"></label>
+            <button class="b b-pri" id="fGuardar">Guardar</button>
+          </div>
+          <div class="caja">
+            <h3>Compartir los datos entre administradores</h3>
+            <p class="sub" style="font-size:14px">Para que todos los administradores vean los mismos pedidos, se guardan en un repositorio <b>privado</b> de GitHub (nadie más lo ve).</p>
+            <ol style="padding-left:18px;font-size:14px;line-height:1.6;margin:0 0 10px">
+              <li>En GitHub crea un repositorio nuevo llamado <code>cachanilla-datos</code> y márcalo <b>Private</b>.</li>
+              <li>Edita tu token (Settings → Developer settings → Fine-grained tokens) y añade ese repositorio con <b>Contents: Read and write</b>.</li>
+              <li>Escribe aquí el repositorio y toca <b>Conectar</b>.</li>
+            </ol>
+            <label class="campo">Repositorio privado<input id="sRepo" placeholder="Samueldj07/cachanilla-datos" autocapitalize="none"></label>
+            <div class="fila"><button class="b b-pri" id="sConectar">Conectar</button><button class="b b-sec" id="sAhora">Sincronizar ahora</button><button class="b b-rojo" id="sQuitar">Desconectar</button></div>
+            <hr style="border:0;border-top:1px solid var(--linea);margin:16px 0">
+            <h3>Respaldo</h3>
+            <div class="fila"><button class="b b-sec" id="bExp">Descargar respaldo</button><label class="b b-sec">Restaurar respaldo<input type="file" id="bImp" accept=".json" hidden></label></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- MI CUENTA -->
     <section class="vista" id="micuenta">
       <h2>Mi cuenta</h2>
@@ -153,6 +274,27 @@
     </section>
   </div>
 </div>
+
+<!-- Documento: factura / recibo -->
+<div class="modal" id="ovDoc"><div class="caja doc-caja">
+  <div class="fila no-print" style="justify-content:space-between;margin-bottom:10px">
+    <div class="fila" id="docTabs"></div>
+    <button class="b b-sec" data-cerrardoc>Cerrar</button>
+  </div>
+  <div id="docArea"></div>
+  <div class="fila no-print" style="margin-top:12px" id="docAcciones"></div>
+</div></div>
+
+<!-- Registrar pago -->
+<div class="modal" id="ovPago"><div class="caja">
+  <h3 id="pgTitulo">Registrar pago</h3>
+  <p class="sub" id="pgSaldo"></p>
+  <label class="campo">Monto<input id="pgMonto" type="number" step="0.01" inputmode="decimal"></label>
+  <label class="campo">Método<select id="pgMetodo"><option>Efectivo</option><option>ATH Móvil</option><option>Transferencia</option><option>Cheque</option><option>Tarjeta</option></select></label>
+  <label class="campo">Referencia (opcional)<input id="pgRef" placeholder="Núm. de cheque o confirmación"></label>
+  <label class="campo">Fecha<input id="pgFecha" type="date"></label>
+  <div class="fila"><button class="b b-sec" id="pgCancelar">Cancelar</button><span style="flex:1"></span><button class="b b-ok" id="pgOk">Registrar y crear recibo</button></div>
+</div></div>
 
 <!-- Aviso a la persona -->
 <div class="modal" id="ovAviso"><div class="caja">
@@ -169,5 +311,7 @@
 <script src="assets/js/admin-comun.js"></script>
 <script src="assets/js/github.js"></script>
 <script src="assets/js/admin.js"></script>
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/comercios.js"></script>
 </body>
 </html>

@@ -54,6 +54,14 @@ Las últimas publicaciones salen solas en la portada y en Videos usando **Behold
 Configúralo en **Panel → Instagram**: crea el feed JSON en Behold, añade `samueldj07.github.io` a la *Domain whitelist*, pega la Feed URL y pulsa *Guardar y publicar*.
 Si no hay feed, la portada muestra los reels fijados o los espacios de video.
 
+## Pedidos de comercios (Administración → Comercios)
+- Pedidos a negocios con productos del menú o líneas libres, precio editable, términos (contado, 7, 15 o 30 días) y exención de IVU para revendedores.
+- **Factura** (F-0001…) para quien recibió y no ha pagado; al registrar un pago se crea el **Recibo** (R-0001…) y la factura queda como *Pagada* o *Pago parcial*.
+- **Recordatorios de pago**: facturas por cobrar ordenadas por vencimiento, con mensaje listo para WhatsApp o correo.
+- Documentos imprimibles / PDF con el logo.
+- **Privacidad:** estos datos NO se publican en el sitio. Se guardan en el equipo y, si se conecta, en un repositorio **privado** (`cachanilla-datos`) para compartirlos entre administradores.
+- No sustituye la facturación fiscal oficial de Hacienda (SURI); confirma con tu contador.
+
 ## Fotos y video (espacios listos)
 Sube las fotos con estos nombres y aparecen solas:
 - `assets/img/portada.jpg` — foto grande del inicio (cuadrada)
