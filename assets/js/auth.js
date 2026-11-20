@@ -46,11 +46,23 @@ function cerrarSesion() {
   try { sessionStorage.removeItem(SESION_KEY); localStorage.removeItem(SESION_KEY); } catch (e) {}
   location.replace('acceso.html');
 }
-/* rol: 'dueño' exige cuenta de dueño; sin rol basta cualquier cuenta */
-function requerirSesion(rol) {
+/* ---------- Tipos de cuenta ---------- */
+const ROLES = {
+  'dueño':  { txt: 'Dueño/a',                   desc: 'panel, caja, menú y cuentas', inicio: 'panel.html' },
+  'admin':  { txt: 'Administrador/a de cuentas', desc: 'solo cuentas y correos',      inicio: 'admin.html' },
+  'cajero': { txt: 'Cajero/a',                  desc: 'solo la caja',                inicio: 'pos.html' }
+};
+const rolTxt = r => (ROLES[r] || ROLES.cajero).txt;
+const inicioDe = r => (ROLES[r] || ROLES.cajero).inicio;
+const puedeAutorizar = r => r === 'dueño' || r === 'admin';
+const opcionesRol = sel => Object.entries(ROLES).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${v.txt} — ${v.desc}</option>`).join('');
+
+/* permitidos: un rol o lista de roles; sin nada basta cualquier cuenta */
+function requerirSesion(permitidos, paginaAcceso) {
   const s = sesionActual();
-  if (!s) { location.replace('acceso.html?volver=' + encodeURIComponent(location.pathname.split('/').pop() + location.hash)); return; }
-  if (rol === 'dueño' && s.rol !== 'dueño') location.replace('pos.html');
+  if (!s) { location.replace((paginaAcceso || 'acceso.html') + '?volver=' + encodeURIComponent(location.pathname.split('/').pop() + location.hash)); return; }
+  const lista = permitidos ? [].concat(permitidos) : null;
+  if (lista && !lista.includes(s.rol)) location.replace(inicioDe(s.rol));
 }
 
 /* ---------- Solicitudes de cuenta (código que viaja por WhatsApp/correo) ---------- */

@@ -34,10 +34,7 @@
       <label for="w">WhatsApp *</label>
       <input id="w" type="tel" required autocomplete="tel" placeholder="787-000-0000">
       <label for="r">Tipo de acceso</label>
-      <select id="r">
-        <option value="cajero">Cajero/a — solo la caja (POS)</option>
-        <option value="dueño">Administrador/a (dueño) — panel completo y autoriza cuentas</option>
-      </select>
+      <select id="r"></select>
       <label for="p1">Crea tu contraseña * <span class="nota">(mínimo 10 caracteres)</span></label>
       <input id="p1" type="password" required minlength="10" autocomplete="new-password">
       <label for="p2">Repite la contraseña *</label>
@@ -66,12 +63,13 @@
   const C = window.CUENTAS;
   const fallo = t => { q('#err').textContent = t; q('#err').classList.add('on'); };
 
+  q('#r').innerHTML = opcionesRol('cajero');
   const inv = location.hash.startsWith('#inv=') ? decodificarInvitacion(location.hash) : null;
   if (inv) {
     if (inv.exp && inv.exp < Date.now()) {
       q('#intro').innerHTML = '<b style="color:#b3261e">Esta invitación expiró.</b> Pide una nueva o llena la solicitud normal.';
     } else {
-      q('#intro').innerHTML = `<b>${esc(inv.por || 'Un administrador')}</b> te invitó como <b>${inv.r === 'dueño' ? 'Administrador/a' : 'Cajero/a'}</b>. Solo crea tu contraseña.`;
+      q('#intro').innerHTML = `<b>${esc(inv.por || 'Un administrador')}</b> te invitó como <b>${rolTxt(inv.r)}</b>. Solo crea tu contraseña.`;
       q('#n').value = inv.n; q('#c').value = inv.c; q('#c').readOnly = true;
       if (inv.w) q('#w').value = inv.w.replace(/^1(?=\d{10}$)/, '');
       q('#r').value = inv.r; q('#r').disabled = true;
@@ -92,11 +90,11 @@
     const sol = { n, c, w, r, m, h: await hashCredencial(c, p1), t: Date.now() };
     if (inv) sol.inv = { por: inv.por || '', t: inv.t };
     const enlace = urlSitio() + 'admin.html#aprobar=' + codificarSolicitud(sol);
-    const rolTxt = r === 'dueño' ? 'Administrador/a (dueño)' : 'Cajero/a (solo caja)';
+    const tipo = rolTxt(r) + ' (' + ROLES[r].desc + ')';
     const texto = [
       inv ? '🔐 Invitación aceptada · La Cachanilla' : '🔐 Solicitud de cuenta · La Cachanilla', '',
-      `Nombre: ${n}`, `Correo: ${c}`, `WhatsApp: +${w}`, `Acceso: ${rolTxt}`, inv ? `Invitado por: ${inv.por || 'administrador'}` : '', m ? `Mensaje: ${m}` : '', '',
-      'Cualquier administrador puede aprobarla aquí (entra con tu cuenta):', enlace
+      `Nombre: ${n}`, `Correo: ${c}`, `WhatsApp: +${w}`, `Acceso: ${tipo}`, inv ? `Invitado por: ${inv.por || 'administrador'}` : '', m ? `Mensaje: ${m}` : '', '',
+      'Cualquier dueño o administrador puede aprobarla aquí:', enlace
     ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
 
     const D = destinosSolicitud();

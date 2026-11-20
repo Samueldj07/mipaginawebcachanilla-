@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Acceso administradores · La Cachanilla</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/marca/icono-32.png">
+<link rel="apple-touch-icon" href="assets/img/marca/icono-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<style>
+  .acceso{background:var(--verde-marca)}
+  .caja-login{box-shadow:0 0 0 8px var(--rosa-marca),0 30px 60px rgba(0,0,0,.4)}
+  .primera{margin-top:16px;background:var(--cielo);border-radius:12px;padding:10px 14px;font-size:14px}
+  .primera summary{cursor:pointer;font-weight:700;color:var(--cobalto-o)}
+  .primera ol{padding-left:18px;margin:8px 0 0;line-height:1.55}
+</style>
+</head>
+<body>
+<main class="acceso">
+  <form class="caja-login form" id="f">
+    <a class="logo-login" href="index.html"><img src="assets/img/marca/logo-completo.webp" alt="La Cachanilla" width="640" height="545"></a>
+    <p class="area" style="color:var(--cobalto)">Acceso de administradores</p>
+    <p class="nota" style="text-align:center;margin:0 0 6px">Para manejar cuentas, correos y autorizaciones.</p>
+    
+    <label for="u">Correo o usuario</label>
+    <input id="u" autocomplete="username" required autocapitalize="none" inputmode="email">
+    <label for="p">Contraseña</label>
+    <input id="p" type="password" autocomplete="current-password" required>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="ver" style="width:auto"> Mostrar contraseña</label>
+    <button class="btn btn-azul" style="width:100%;justify-content:center;margin-top:14px" id="b">Entrar</button>
+    <div class="error" id="err"></div>
+    <details class="primera">
+      <summary>¿Es tu primera vez?</summary>
+      <ol>
+        <li>Entra con el usuario <b>cachanilla</b> y la <b>contraseña temporal</b> que recibieron los dueños.</li>
+        <li>En <b>Administración → Invitar → “Crear cuenta”</b>, crea tu cuenta con <b>tu correo</b> y tu propia contraseña.</li>
+        <li>Sal (<b>Salir</b>) y vuelve a entrar aquí con <b>tu correo</b>.</li>
+        <li>Cuando todos los dueños tengan su correo, desactiva <b>cachanilla</b> en <b>Equipo</b>.</li>
+      </ol>
+    </details>
+    <p style="text-align:center;margin:14px 0 0;font-size:14px"><a href="acceso.html">← Acceso dueños y equipo</a></p>
+    <p style="text-align:center;margin:8px 0 0"><a href="index.html">← Volver al sitio</a></p>
+  </form>
+</main>
+<script src="assets/js/cuentas.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  const q = s => document.querySelector(s);
+  const volver = new URLSearchParams(location.search).get('volver');
+  const destino = /^admin\.html(#[\w=-]*)?$/.test(volver || '') ? volver : 'admin.html';
+  const ir = s => {
+    if (puedeAutorizar(s.rol)) return location.replace(destino);
+    q('#err').textContent = 'Esta cuenta es de ' + rolTxt(s.rol) + ' y no puede administrar cuentas. Usa el acceso de dueños y equipo.'; q('#err').classList.add('on');
+    try { sessionStorage.removeItem(SESION_KEY); localStorage.removeItem(SESION_KEY); } catch (e) {}
+    return true;
+  };
+  const yaDentro = sesionActual(); if (yaDentro) ir(yaDentro);
+
+  q('#ver').onchange = e => q('#p').type = e.target.checked ? 'text' : 'password';
+  q('#f').addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = q('#err');
+    const bloqueo = Number(localStorage.getItem('cach_bloqueo') || 0);
+    if (bloqueo > Date.now()) { err.textContent = 'Demasiados intentos. Espera ' + Math.ceil((bloqueo - Date.now()) / 1000) + ' segundos.'; err.classList.add('on'); return; }
+    q('#b').disabled = true;
+    const ok = await iniciarSesion(q('#u').value, q('#p').value);
+    q('#b').disabled = false;
+    if (ok) { localStorage.removeItem('cach_intentos'); ir(ok); return; }
+    const n = Number(localStorage.getItem('cach_intentos') || 0) + 1;
+    localStorage.setItem('cach_intentos', n);
+    if (n >= 5) { localStorage.setItem('cach_bloqueo', Date.now() + 60000); localStorage.setItem('cach_intentos', 0); }
+    err.textContent = 'Correo/usuario o contraseña incorrectos. Si acabas de solicitar tu cuenta, espera la aprobación.'; err.classList.add('on');
+    q('#p').value = ''; q('#p').focus();
+  });
+</script>
+</body>
+</html>

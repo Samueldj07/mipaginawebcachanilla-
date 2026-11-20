@@ -4,7 +4,6 @@ const PUB = window.CUENTAS;
 const copia = o => JSON.parse(JSON.stringify(o));
 const igual = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const hoyISO = () => new Date().toISOString().slice(0, 10);
-const rolTxt = r => r === 'dueño' ? 'Administrador/a' : 'Cajero/a';
 const telFmt = w => w ? '+' + w : '—';
 const correoOk = c => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c);
 
@@ -29,7 +28,7 @@ function textoCuentasJS() {
    LA CACHANILLA · CUENTAS DEL ÁREA PRIVADA
    Actualizado desde Administración el ${new Date().toLocaleString('es-PR')}${yo ? ' por ' + yo.nombre : ''}.
    No editar a mano: usa admin.html. Las contraseñas NO se guardan, solo una huella (hash).
-   rol "dueño" = Administrador/a · rol "cajero" = solo caja
+   rol "dueño" = todo · rol "admin" = solo cuentas y correos · rol "cajero" = solo caja
    ===================================================================== */
 window.CUENTAS = ${JSON.stringify(cuentas, null, 2)};
 `;
@@ -72,12 +71,12 @@ function pintarEstado(fase) {
 /* ---------- Primeros pasos ---------- */
 function pintarPasos() {
   const D = destinosSolicitud(cuentas);
-  const adminsCorreo = cuentas.usuarios.filter(c => c.rol === 'dueño' && !c.inactiva && c.correo);
+  const adminsCorreo = cuentas.usuarios.filter(c => puedeAutorizar(c.rol) && !c.inactiva && c.correo);
   const compartida = cuentas.usuarios.find(c => c.usuario === 'cachanilla');
   const pasos = [
     [ghConectado(), 'Conecta este equipo a GitHub (pestaña <b>Conexión y avisos</b>) para que aprobar active las cuentas al instante.'],
-    [adminsCorreo.length >= 1, 'Crea tu cuenta de administrador con tu correo (pestaña <b>Invitar</b> → “Crear cuenta”, o envíate una invitación).'],
-    [adminsCorreo.length >= 2, 'Invita al otro dueño como <b>Administrador/a</b> con su correo.'],
+    [adminsCorreo.length >= 1, 'Crea tu cuenta con tu correo (pestaña <b>Invitar</b> → “Crear cuenta”) como <b>Dueño/a</b> o <b>Administrador/a de cuentas</b>.'],
+    [adminsCorreo.length >= 2, 'Crea o invita la segunda cuenta (ej. <b>lacachanillamx@outlook.com</b>).'],
     [D.correos.length > 0, 'Revisa los correos y WhatsApp donde llegan las solicitudes.'],
     [!compartida || compartida.inactiva, 'Cuando los dueños ya entren con su correo, desactiva la cuenta compartida <code>cachanilla</code> en <b>Equipo</b>.'],
   ];
@@ -86,10 +85,10 @@ function pintarPasos() {
 }
 
 /* ---------- Equipo ---------- */
-const adminsActivos = () => cuentas.usuarios.filter(c => c.rol === 'dueño' && !c.inactiva).length;
+const adminsActivos = () => cuentas.usuarios.filter(c => puedeAutorizar(c.rol) && !c.inactiva).length;
 function puedeQuitar(c) {
   if (yo && c.usuario === yo.u) { toast('No puedes quitarte el acceso a ti mismo', true); return false; }
-  if (c.rol === 'dueño' && !c.inactiva && adminsActivos() <= 1) { toast('Debe quedar al menos un administrador activo', true); return false; }
+  if (puedeAutorizar(c.rol) && !c.inactiva && adminsActivos() <= 1) { toast('Debe quedar al menos un dueño o administrador activo', true); return false; }
   return true;
 }
 function pintarEquipo() {
@@ -100,7 +99,7 @@ function pintarEquipo() {
     return `<tr style="${c.inactiva ? 'opacity:.5' : ''}">
       <td><b>${esc(c.nombre || '')}</b>${yo && c.usuario === yo.u ? ' <small>(tú)</small>' : ''}<br><small style="color:var(--gris)">${telFmt(esc(c.whatsapp))}</small></td>
       <td>${esc(c.usuario)}</td>
-      <td><select data-rol="${i}" style="padding:6px;border-radius:8px;border:1.5px solid var(--linea)"><option value="cajero" ${c.rol !== 'dueño' ? 'selected' : ''}>Cajero/a</option><option value="dueño" ${c.rol === 'dueño' ? 'selected' : ''}>Administrador/a</option></select></td>
+      <td><select data-rol="${i}" style="padding:6px;border-radius:8px;border:1.5px solid var(--linea)">${opcionesRol(c.rol)}</select></td>
       <td>${c.inactiva ? 'Desactivada' : 'Activa'}${nota ? `<br><small style="color:var(--rosa)">${nota}</small>` : ''}</td>
       <td class="n" style="white-space:nowrap">
         <button class="b b-sec" style="padding:6px 10px" data-act="${i}">${c.inactiva ? 'Activar' : 'Desactivar'}</button>
@@ -110,7 +109,7 @@ function pintarEquipo() {
 $('#cFilas').addEventListener('change', e => {
   const sel = e.target.closest('[data-rol]'); if (!sel) return;
   const c = cuentas.usuarios[sel.dataset.rol];
-  if (sel.value === 'cajero' && !puedeQuitar(c)) { sel.value = 'dueño'; return; }
+  if (!puedeAutorizar(sel.value) && puedeAutorizar(c.rol) && !puedeQuitar(c)) { sel.value = c.rol; return; }
   c.rol = sel.value; guardar(`Cambiar acceso de ${c.usuario} a ${rolTxt(c.rol)}`);
 });
 $('#cFilas').addEventListener('click', e => {
@@ -158,7 +157,7 @@ function mostrarSolicitud(sol) {
     <tr><td>Enviada</td><td>${new Date(sol.t).toLocaleString('es-PR')}</td></tr></table>
     ${yaIgual ? '<p class="estado ok" style="margin:12px 0 0">Esta solicitud ya fue aprobada.</p>' : existe ? '<p class="aviso" style="margin:12px 0 0">Ya existe una cuenta con este correo. Si apruebas, su contraseña cambia por la nueva.</p>' : ''}
     <div class="fila" style="margin-top:14px">
-      <label class="campo" style="margin:0">Dar acceso como<select id="solRol"><option value="cajero" ${sol.r !== 'dueño' ? 'selected' : ''}>Cajero/a</option><option value="dueño" ${sol.r === 'dueño' ? 'selected' : ''}>Administrador/a</option></select></label>
+      <label class="campo" style="margin:0">Dar acceso como<select id="solRol">${opcionesRol(sol.r)}</select></label>
       <span style="flex:1"></span>
       <button class="b b-rojo" id="solNo">Rechazar</button>
       <button class="b b-ok" id="solSi">${ghConectado() ? 'Aprobar y activar' : 'Aprobar'}</button>
@@ -172,7 +171,7 @@ function mostrarSolicitud(sol) {
     await guardar(`Aprobar cuenta de ${sol.n} (${rolTxt(rol)})`);
     mostrarSolicitud(null); history.replaceState(null, '', 'admin.html');
     avisar('✅ Cuenta aprobada', subActivacion(), { w: sol.w, c },
-      `¡Hola ${sol.n}! 🎉 Tu cuenta de La Cachanilla fue aprobada como ${rolTxt(rol)}.\n\nEntra aquí con tu correo (${c}) y la contraseña que creaste:\n${urlSitio()}acceso.html\n\nSi todavía no te deja entrar, espera unos minutos.`,
+      `¡Hola ${sol.n}! 🎉 Tu cuenta de La Cachanilla fue aprobada como ${rolTxt(rol)}.\n\nEntra aquí con tu correo (${c}) y la contraseña que creaste:\n${urlSitio()}${rol === 'admin' ? 'acceso-admin.html' : 'acceso.html'}\n\nSi todavía no te deja entrar, espera unos minutos.`,
       'Tu cuenta de La Cachanilla fue aprobada');
   };
   $('#solNo').onclick = () => {
@@ -209,7 +208,7 @@ $('#nCrear').onclick = async () => {
   await guardar(`Crear cuenta de ${n} (${rolTxt(r)})`);
   ['#nN', '#nC', '#nW', '#nP'].forEach(x => $(x).value = '');
   avisar('✅ Cuenta creada', subActivacion(), { w, c },
-    `¡Hola ${n}! Te creamos una cuenta en La Cachanilla como ${rolTxt(r)}.\n\nEntra aquí: ${urlSitio()}acceso.html\nUsuario: ${c}\nContraseña temporal: ${p}\n\nCámbiala en “Mi cuenta” al entrar (si eres cajero/a, pídele a un administrador).`,
+    `¡Hola ${n}! Te creamos una cuenta en La Cachanilla como ${rolTxt(r)}.\n\nEntra aquí: ${urlSitio()}${r === 'admin' ? 'acceso-admin.html' : 'acceso.html'}\nUsuario: ${c}\nContraseña temporal: ${p}\n\nCámbiala en “Mi cuenta” al entrar (si eres cajero/a, pídele a un administrador).`,
     'Tu cuenta de La Cachanilla');
 };
 
@@ -257,6 +256,11 @@ $('#sGen').onclick = async () => {
 };
 
 /* ---------- Navegación ---------- */
+/* Los administradores de cuentas no ven Panel ni Caja */
+if (yo && yo.rol === 'admin') $$('.tabs a[href="panel.html"], .tabs a[href="pos.html"]').forEach(a => a.remove());
+if (yo && yo.rol === 'admin') { const m = $('.adm-top .marca'); m && m.setAttribute('href', 'admin.html'); }
+$('#iR').innerHTML = opcionesRol('cajero'); $('#nR').innerHTML = opcionesRol('cajero');
+
 function pintarTodo() { pintarEstado(); pintarPasos(); pintarEquipo(); pintarAjustes(); $('#miCuenta').textContent = yo ? `${yo.nombre} · ${yo.u} · ${rolTxt(yo.rol)}` : ''; }
 function ir(v) {
   $$('.tabs button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
