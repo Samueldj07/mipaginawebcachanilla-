@@ -12,7 +12,8 @@ Sitio web de La Cachanilla con diseño inspirado en la talavera poblana, página
 | Noticias y eventos | `noticias.html` | Clientes |
 | Nosotros + galería | `nosotros.html` | Clientes |
 | Videos de Instagram | `instagram.html` | Clientes |
-| Acceso | `acceso.html` | Equipo (correo o usuario + contraseña) |
+| Acceso dueños y equipo | `acceso.html` | Dueños y cajeros |
+| Acceso de administradores | `acceso-admin.html` | Administradores de cuentas y dueños: van directo a Administración |
 | Solicitar acceso | `registro.html` | Personal nuevo: la solicitud llega al WhatsApp y correo de los dueños |
 | Panel de dueños | `panel.html` | Administradores: resumen de ventas y catálogo de la semana |
 | Administración | `admin.html` | Administradores: autorizar, invitar, equipo, conexión con GitHub |
@@ -40,7 +41,7 @@ Solo los **Administradores/as** (dueños) entran. Cualquiera de ellos puede auto
 - **Invitación:** Administración → *Invitar* → se envía un enlace por WhatsApp/correo; la persona crea su contraseña y devuelve la confirmación para aprobar.
 - **Publicación automática:** si el equipo del administrador está conectado a GitHub (Administración → *Conexión y avisos*, con un token que solo puede escribir en este repositorio), al aprobar la cuenta queda activa en 1–5 minutos sin subir archivos. Lo mismo para *Publicar en el sitio* del catálogo.
 - Sin conexión: descarga `cuentas.js` y súbelo a GitHub en `assets/js/`.
-- Accesos: **Administrador/a** (panel, administración y caja) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
+- Tipos de cuenta: **Dueño/a** (panel, menú, caja y cuentas), **Administrador/a de cuentas** (solo cuentas y correos) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
 
 ## Menú, días de recogido y noticias
 Todo se edita en el **Panel** y se publica con *Publicar en el sitio*:

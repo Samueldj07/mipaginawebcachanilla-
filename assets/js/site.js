@@ -83,7 +83,7 @@
         </div>
         <div class="copy">
           <span>© ${new Date().getFullYear()} ${esc(N.nombre)} · Hecho con cariño mexicano en Puerto Rico</span>
-          <a href="acceso.html" style="opacity:.6">Acceso dueños</a>
+          <span><a href="acceso.html" style="opacity:.6">Acceso dueños</a> · <a href="acceso-admin.html" style="opacity:.6">Administradores</a></span>
         </div>
       </div>
     </footer>`;

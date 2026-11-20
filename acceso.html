@@ -15,7 +15,7 @@
 <main class="acceso">
   <form class="caja-login form" id="f">
     <a class="logo-login" href="index.html"><img src="assets/img/marca/logo-completo.webp" alt="La Cachanilla" width="640" height="545"></a>
-    <p class="area">Área privada</p>
+    <p class="area">Acceso dueños y equipo</p>
     <p class="nota" style="text-align:center;margin:4px 0 8px">Panel de administración y caja (POS)</p>
     <label for="u">Correo o usuario</label>
     <input id="u" autocomplete="username" required autocapitalize="none" inputmode="email">
@@ -25,6 +25,7 @@
     <button class="btn btn-azul" style="width:100%;justify-content:center;margin-top:14px" id="b">Entrar</button>
     <div class="error" id="err"></div>
     <p style="text-align:center;margin:16px 0 0;font-size:14px">¿Trabajas con nosotros y no tienes cuenta? <a href="registro.html">Solicitar acceso</a></p>
+    <p style="text-align:center;margin:6px 0 0;font-size:14px"><a href="acceso-admin.html">Acceso de administradores →</a></p>
     <p style="text-align:center;margin:8px 0 0"><a href="index.html">← Volver al sitio</a></p>
   </form>
 </main>
@@ -34,7 +35,7 @@
   const q = s => document.querySelector(s);
   const volver = new URLSearchParams(location.search).get('volver');
   const destino = /^[\w-]+\.html(#[\w=-]*)?$/.test(volver || '') ? volver : 'panel.html';
-  const ir = s => location.replace(s.rol === 'dueño' ? destino : 'pos.html');
+  const ir = s => location.replace(s.rol === 'dueño' ? destino : (s.rol === 'admin' && destino.startsWith('admin.html') ? destino : inicioDe(s.rol)));
   const yaDentro = sesionActual(); if (yaDentro) ir(yaDentro);
 
   q('#ver').onchange = e => q('#p').type = e.target.checked ? 'text' : 'password';
