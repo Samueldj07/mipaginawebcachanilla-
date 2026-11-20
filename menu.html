@@ -25,7 +25,7 @@
     <div class="wrap">
       <div class="filtros" id="filtros"></div>
       <div class="grid" id="lista"></div>
-      <p class="nota" style="text-align:center;margin-top:30px">Precios no incluyen IVU. Lo marcado “Esta semana” se puede pedir en línea.</p>
+      <p class="nota" style="text-align:center;margin-top:30px">Precios no incluyen IVU. Lo marcado “Esta semana” está en el menú de este fin de semana y se puede pedir en línea.</p>
       <p style="text-align:center"><a class="btn btn-rosa" href="pedidos.html">Hacer pedido</a></p>
     </div>
   </section>
@@ -34,7 +34,7 @@
 <script src="assets/js/catalogo.js"></script>
 <script src="assets/js/site.js"></script>
 <script>
-  const P = window.CACHANILLA.productos;
+  const P = [...window.CACHANILLA.productos].sort((a, b) => (b.disponible - a.disponible));
   const cats = ['Todo', ...new Set(P.map(p => p.cat))];
   let actual = 'Todo';
   function pintar() {
@@ -42,7 +42,7 @@
     $('#lista').innerHTML = P.filter(p => actual === 'Todo' || p.cat === actual).map(p => `
       <article class="card rev">
         <div class="img">${fotoProducto(p)}${p.disponible ? '<span class="tag" style="background:var(--hoja)">Esta semana</span>' : '<span class="tag" style="background:var(--gris)">No disponible</span>'}</div>
-        <div class="body"><h3>${esc(p.nombre)}</h3><p>${esc(p.desc)}</p><div class="precio">${money(p.precio)}</div></div>
+        <div class="body"><h3>${esc(p.nombre)}</h3><p>${esc(p.desc)}</p>${p.opciones ? `<div class="sabores">${p.opciones.map(o => `<span>${esc(o)}</span>`).join('')}</div>` : ''}<div class="precio">${money(p.precio)}</div></div>
       </article>`).join('');
     revelar();
   }

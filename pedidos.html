@@ -38,16 +38,16 @@
           <input id="nombre" required autocomplete="name">
           <label for="tel">Teléfono *</label>
           <input id="tel" type="tel" required autocomplete="tel" placeholder="787-000-0000">
-          <label for="fecha">¿Para cuándo? *</label>
-          <input id="fecha" type="date" required>
-          <label for="entrega">¿Cómo lo recibes?</label>
+          <label for="fecha">¿Qué día lo recoges? *</label>
+          <select id="dia" required></select>
+          <input id="fecha" type="date" required style="display:none">
+          <label for="entrega">Tipo de pedido</label>
           <select id="entrega">
-            <option>Recojo en el próximo evento/mercado</option>
-            <option>Recojo en punto acordado</option>
-            <option>Pedido para fiesta/evento (coordinar)</option>
+            <option>Lo recojo ese día en el lugar indicado</option>
+            <option>Pedido grande para fiesta/evento (coordinar)</option>
           </select>
           <label for="notas">Notas</label>
-          <textarea id="notas" rows="2" placeholder="Ej. 6 conchas de chocolate y 6 de vainilla"></textarea>
+          <textarea id="notas" rows="2" placeholder="Ej. hora aproximada en que pasas"></textarea>
           <button class="btn btn-rosa" style="width:100%;justify-content:center;margin-top:16px" id="enviar" disabled>Enviar pedido por WhatsApp</button>
           <button type="button" class="btn btn-borde" style="width:100%;justify-content:center;margin-top:8px" id="vaciar">Vaciar</button>
         </form>
@@ -63,74 +63,101 @@
   const D = window.CACHANILLA;
   const P = D.productos.filter(p => p.disponible);
   const byId = id => P.find(p => p.id === id);
+  const clave = (id, op) => op ? id + '|' + op : id;
+  const partes = k => { const [id, ...r] = k.split('|'); return { id, op: r.join('|') }; };
   let pedido = {};
   try { pedido = JSON.parse(localStorage.getItem('cach_pedido') || '{}'); } catch (e) {}
-  Object.keys(pedido).forEach(id => { if (!byId(id)) delete pedido[id]; });
+  Object.keys(pedido).forEach(k => { const { id, op } = partes(k), p = byId(id); if (!p || (op && !(p.opciones || []).includes(op))) delete pedido[k]; });
   const guardar = () => { try { localStorage.setItem('cach_pedido', JSON.stringify(pedido)); } catch (e) {} };
+  const opElegida = {};   // id -> opción seleccionada en la tarjeta
 
   $('#semana').textContent = D.semana;
   $('#nota').textContent = D.pedidosNota;
-  const min = new Date(Date.now() + 2 * 864e5);
-  $('#fecha').min = min.toISOString().slice(0, 10);
+
+  /* Días de recogido: los que configuran los dueños (solo fechas que no han pasado) */
+  const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
+  const dias = (D.diasPedido || []).filter(d => new Date(d.fecha + 'T23:59') >= hoy);
+  if (dias.length) {
+    $('#dia').innerHTML = '<option value="">Elige el día…</option>' + dias.map(d => `<option value="${esc(d.fecha)}">${esc(d.etiqueta)}</option>`).join('');
+    $('#fecha').required = false;
+  } else {
+    $('#dia').remove(); const f = $('#fecha'); f.style.display = ''; f.min = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
+  }
 
   const cats = ['Todo', ...new Set(P.map(p => p.cat))];
   let actual = 'Todo';
+  const cantTarjeta = p => pedido[clave(p.id, p.opciones ? opElegida[p.id] : '')] || 0;
+  const totalProducto = p => Object.keys(pedido).filter(k => partes(k).id === p.id).reduce((s, k) => s + pedido[k], 0);
 
   function pintarCatalogo() {
     $('#filtros').innerHTML = cats.map(c => `<button class="${c === actual ? 'on' : ''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
-    $('#catalogo').innerHTML = P.filter(p => actual === 'Todo' || p.cat === actual).map(p => `
-      <article class="card ${pedido[p.id] ? 'sel' : ''}" data-id="${p.id}">
-        <div class="img">${fotoProducto(p)}<span class="tag">${esc(p.cat)}</span></div>
+    $('#catalogo').innerHTML = P.filter(p => actual === 'Todo' || p.cat === actual).map(p => {
+      if (p.opciones && !opElegida[p.id]) opElegida[p.id] = p.opciones[0];
+      const tot = totalProducto(p);
+      return `
+      <article class="card ${tot ? 'sel' : ''}" data-id="${p.id}">
+        <div class="img">${fotoProducto(p)}<span class="tag">${esc(p.cat)}</span>${tot ? `<span class="tag" style="left:auto;right:12px;background:var(--rosa)">${tot} en tu pedido</span>` : ''}</div>
         <div class="body">
           <h3>${esc(p.nombre)}</h3><p>${esc(p.desc)}</p>
           <div class="precio">${money(p.precio)}</div>
+          ${p.opciones ? `<label class="nota" style="display:block;margin-top:8px">Sabor / tipo
+            <select class="op" style="width:100%;padding:9px 10px;border-radius:10px;border:2px solid var(--linea);font-family:inherit;font-size:15px;margin-top:3px">
+              ${p.opciones.map(o => `<option ${o === opElegida[p.id] ? 'selected' : ''}>${esc(o)}</option>`).join('')}</select></label>` : ''}
           <div class="qty">
             <button type="button" data-d="-1" aria-label="Quitar uno">−</button>
-            <output>${pedido[p.id] || 0}</output>
+            <output>${cantTarjeta(p)}</output>
             <button type="button" class="mas" data-d="1" aria-label="Agregar uno">+</button>
           </div>
         </div>
-      </article>`).join('') || '<p class="nota">No hay productos disponibles esta semana.</p>';
+      </article>`;
+    }).join('') || '<p class="nota">No hay productos disponibles esta semana.</p>';
   }
 
+  function lineas() {
+    return Object.keys(pedido).map(k => { const { id, op } = partes(k), p = byId(id); return { k, p, op, q: pedido[k], nombre: p.nombre + (op ? ' (' + op + ')' : '') }; })
+      .sort((a, b) => P.indexOf(a.p) - P.indexOf(b.p));
+  }
   function pintarResumen() {
-    const ids = Object.keys(pedido);
-    let total = 0, n = 0;
-    $('#lineas').innerHTML = ids.length ? ids.map(id => {
-      const p = byId(id), q = pedido[id]; total += p.precio * q; n += q;
-      return `<div class="lin"><span>${q} × ${esc(p.nombre)}</span><b>${money(p.precio * q)}</b></div>`;
-    }).join('') : '<p class="nota">Aún no has elegido nada. Usa el botón <b>+</b> en cada producto.</p>';
+    const ls = lineas(); let total = 0, n = 0;
+    $('#lineas').innerHTML = ls.length ? ls.map(l => { total += l.p.precio * l.q; n += l.q;
+      return `<div class="lin"><span>${l.q} × ${esc(l.nombre)}</span><b>${money(l.p.precio * l.q)}</b></div>`; }).join('')
+      : '<p class="nota">Aún no has elegido nada. Usa el botón <b>+</b> en cada producto.</p>';
     $('#total').textContent = $('#mTotal').textContent = money(total);
     $('#mCount').textContent = n + (n === 1 ? ' producto' : ' productos');
     $('#enviar').disabled = !n;
   }
 
   $('#filtros').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { actual = b.dataset.c; pintarCatalogo(); } });
+  $('#catalogo').addEventListener('change', e => {
+    if (!e.target.classList.contains('op')) return;
+    const card = e.target.closest('.card'); opElegida[card.dataset.id] = e.target.value;
+    card.querySelector('output').textContent = cantTarjeta(byId(card.dataset.id));
+  });
   $('#catalogo').addEventListener('click', e => {
     const b = e.target.closest('button[data-d]'); if (!b) return;
-    const card = b.closest('.card'), id = card.dataset.id;
-    pedido[id] = Math.max(0, (pedido[id] || 0) + Number(b.dataset.d));
-    if (!pedido[id]) delete pedido[id];
-    card.querySelector('output').textContent = pedido[id] || 0;
-    card.classList.toggle('sel', !!pedido[id]);
-    guardar(); pintarResumen();
+    const card = b.closest('.card'), p = byId(card.dataset.id), k = clave(p.id, p.opciones ? opElegida[p.id] : '');
+    pedido[k] = Math.max(0, (pedido[k] || 0) + Number(b.dataset.d));
+    if (!pedido[k]) delete pedido[k];
+    guardar(); pintarCatalogo(); pintarResumen();
   });
   $('#vaciar').addEventListener('click', () => { pedido = {}; guardar(); pintarCatalogo(); pintarResumen(); });
 
   $('#form').addEventListener('submit', e => {
     e.preventDefault();
-    const ids = Object.keys(pedido); if (!ids.length) return;
-    const f = new Date($('#fecha').value + 'T12:00').toLocaleDateString('es-PR', { weekday: 'long', day: 'numeric', month: 'long' });
+    const ls = lineas(); if (!ls.length) return;
+    let cuando;
+    if ($('#dia')) { const d = dias.find(x => x.fecha === $('#dia').value); if (!d) return toast('Elige el día en que recoges', true); cuando = d.etiqueta; }
+    else cuando = new Date($('#fecha').value + 'T12:00').toLocaleDateString('es-PR', { weekday: 'long', day: 'numeric', month: 'long' });
     let total = 0;
-    const lineas = ids.map(id => { const p = byId(id), q = pedido[id]; total += p.precio * q; return `• ${q} × ${p.nombre} — ${money(p.precio * q)}`; });
+    const txt = ls.map(l => { total += l.p.precio * l.q; return `• ${l.q} × ${l.nombre} — ${money(l.p.precio * l.q)}`; });
     const msg = [
       `¡Hola ${D.negocio.nombre}! 🌮 Quiero hacer un pedido:`, '',
-      ...lineas, '',
+      ...txt, '',
       `Subtotal: ${money(total)} (+ IVU)`,
       `Nombre: ${$('#nombre').value.trim()}`,
       `Teléfono: ${$('#tel').value.trim()}`,
-      `Para: ${f}`,
-      `Entrega: ${$('#entrega').value}`,
+      `Recojo: ${cuando}`,
+      `Tipo: ${$('#entrega').value}`,
       $('#notas').value.trim() ? `Notas: ${$('#notas').value.trim()}` : ''
     ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
     window.open(`https://wa.me/${D.negocio.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');

@@ -44,8 +44,21 @@
     <svg class="ola" viewBox="0 0 1440 50" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 C 240 0 480 60 720 30 C 960 0 1200 60 1440 30 L1440 50 L0 50 Z" fill="#fbf6ec"/></svg>
   </section>
 
+  <!-- NOTICIAS -->
+  <section id="seccionNoticias">
+    <div class="wrap">
+      <div class="titulo rev">
+        <div class="cenefa"></div>
+        <h2>Noticias y novedades</h2>
+        <p>Lo nuevo de La Cachanilla: menú, eventos y sorpresas.</p>
+      </div>
+      <div class="noticias" id="noticiasInicio"></div>
+      <p style="text-align:center;margin-top:30px"><a class="btn btn-borde" href="noticias.html">Ver todas las noticias</a></p>
+    </div>
+  </section>
+
   <!-- DESTACADOS -->
-  <section>
+  <section class="bg-rosa">
     <div class="wrap">
       <div class="titulo rev">
         <div class="cenefa"></div>
@@ -119,6 +132,7 @@
       <div class="img">${fotoProducto(p)}<span class="tag">${esc(p.cat)}</span></div>
       <div class="body"><h3>${esc(p.nombre)}</h3><p>${esc(p.desc)}</p><div class="precio">${money(p.precio)}</div></div>
     </article>`).join('');
+  const nt = tarjetasNoticias(3); if (nt) $('#noticiasInicio').innerHTML = nt; else $('#seccionNoticias').remove();
   $('#eventos').innerHTML = D.negocio.eventos.map(e => `
     <div class="evento rev"><div class="f">${esc(e.fecha)}</div><div><b>${esc(e.lugar)}</b><small>${esc(e.nota || '')}</small></div></div>`).join('');
   const ig = $('#igLink'); ig.href = 'https://instagram.com/' + D.negocio.instagram; ig.textContent = '@' + D.negocio.instagram;

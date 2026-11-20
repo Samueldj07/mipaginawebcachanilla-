@@ -5,7 +5,10 @@ let orden = {};                 // id -> cantidad
 let cat = 'Todo', filtro = '';
 let pago = { metodo: 'Efectivo', recibido: '' };
 
-const porId = id => productos.find(p => p.id === id);
+const porId = id => productos.find(p => p.id === String(id).split('|')[0]);
+const opDe = k => String(k).split('|').slice(1).join('|');
+const cantProducto = id => Object.keys(orden).filter(k => k.split('|')[0] === id).reduce((s, k) => s + orden[k], 0);
+let opAbierta = null;
 const esBebida = p => /bebida/i.test(p.cat);
 
 /* ---------- Cálculo ---------- */
@@ -18,22 +21,24 @@ function calcular(lineas) {
   else { subtotal = suma; ivu = r2(suma * tasa); total = r2(subtotal + ivu); }
   return { art, subtotal, ivu, total };
 }
-const lineasOrden = () => Object.entries(orden).map(([id, q]) => { const p = porId(id); return { id, nombre: p.nombre, precio: p.precio, q }; });
+const lineasOrden = () => Object.entries(orden).filter(([k]) => porId(k)).map(([k, q]) => { const p = porId(k), op = opDe(k); return { id: k, nombre: p.nombre + (op ? ' (' + op + ')' : ''), precio: p.precio, q }; });
 
 /* ---------- Catálogo ---------- */
 function pintarCatalogo() {
-  const cats = ['Todo', ...new Set(productos.map(p => p.cat))];
+  const enMenu = productos.filter(p => p.disponible !== false), fuera = productos.filter(p => p.disponible === false);
+  const cats = ['Todo', ...new Set(enMenu.map(p => p.cat)), ...(fuera.length ? ['Fuera del menú'] : [])];
   $('#chips').innerHTML = cats.map(c => `<button class="${c === cat ? 'on' : ''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
   const f = filtro.trim().toLowerCase();
-  const lista = productos.filter(p => (cat === 'Todo' || p.cat === cat) && (!f || p.nombre.toLowerCase().includes(f)));
+  const base = cat === 'Fuera del menú' ? fuera : (f ? productos : enMenu);
+  const lista = base.filter(p => (cat === 'Todo' || cat === 'Fuera del menú' || p.cat === cat) && (!f || p.nombre.toLowerCase().includes(f)));
   $('#tiles').innerHTML = lista.map(p => {
-    const q = orden[p.id] || 0;
+    const q = cantProducto(p.id);
     return `<div class="tile-w">
       <button class="tile ${esBebida(p) ? 'bebida' : ''} ${q ? 'sel' : ''}" data-add="${p.id}">
         ${q ? `<span class="q">${q}</span>` : ''}
-        <span class="n">${esc(p.nombre)}</span><span class="p">${money(p.precio)}</span>
+        <span class="n">${esc(p.nombre)}</span>${p.opciones ? `<span style="font-size:11px;color:var(--gris);position:relative">${p.opciones.length} sabores ›</span>` : ''}<span class="p">${money(p.precio)}</span>
       </button>
-      ${q ? `<button class="menos" data-menos="${p.id}" aria-label="Quitar uno">−</button>` : ''}
+      ${q && !p.opciones ? `<button class="menos" data-menos="${p.id}" aria-label="Quitar uno">−</button>` : ''}
     </div>`;
   }).join('') || '<p class="vacio">Sin resultados.</p>';
 }
@@ -66,7 +71,15 @@ function pintarOrden() {
 function cambiar(id, d) {
   orden[id] = (orden[id] || 0) + d;
   if (orden[id] <= 0) delete orden[id];
-  pintarCatalogo(); pintarOrden();
+  pintarCatalogo(); pintarOrden(); if (opAbierta) pintarOpciones();
+}
+/* Selector de sabores */
+function abrirOpciones(id) { opAbierta = id; pintarOpciones(); abrir('ovOpcion'); }
+function pintarOpciones() {
+  const p = porId(opAbierta); if (!p) return;
+  $('#opcionHoja').innerHTML = `<h3>${esc(p.nombre)} · ${money(p.precio)}</h3><p class="sub" style="margin:0 0 10px">Toca + en cada sabor</p>` +
+    p.opciones.map(o => { const k = p.id + '|' + o, q = orden[k] || 0; return `<div class="linea"><div class="nm" style="font-size:16px">${esc(o)}</div><div class="st"><button data-d="-1" data-id="${esc(k)}" style="width:44px;height:44px">−</button><span style="font-size:18px">${q}</span><button data-d="1" data-id="${esc(k)}" style="width:44px;height:44px;background:var(--rosa);color:#fff">+</button></div></div>`; }).join('') +
+    '<button class="b b-ok" style="width:100%;justify-content:center;margin-top:14px;padding:15px" data-cerrar="ovOpcion">Listo</button>';
 }
 function limpiar() { orden = {}; pintarCatalogo(); pintarOrden(); cerrar('ovOrden'); }
 
@@ -278,7 +291,8 @@ $('#chips').onclick = e => { const b = e.target.closest('button'); if (b) { cat 
 $('#buscar').oninput = e => { filtro = e.target.value; pintarCatalogo(); };
 $('#tiles').onclick = e => {
   const m = e.target.closest('[data-menos]'); if (m) return cambiar(m.dataset.menos, -1);
-  const a = e.target.closest('[data-add]'); if (a) cambiar(a.dataset.add, 1);
+  const a = e.target.closest('[data-add]'); if (!a) return;
+  const p = porId(a.dataset.add); if (p && p.opciones) abrirOpciones(p.id); else cambiar(a.dataset.add, 1);
 };
 document.addEventListener('click', e => {
   const d = e.target.closest('[data-d]'); if (d) return cambiar(d.dataset.id, Number(d.dataset.d));
