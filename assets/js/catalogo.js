@@ -31,14 +31,14 @@ window.CACHANILLA = {
     videoLocal: "assets/video/cachanilla.mp4",
     // Próximos eventos / dónde encontrarnos
     eventos: [
-      { fecha: "Sáb 21 nov", lugar: "Panadería Mexicana La Cachanilla", nota: "Lugar y horario por anunciar en Instagram" },
+      { fecha: "Sáb 21 nov", lugar: "Panadería Mexicana La Cachanilla", nota: "Edificio 1109, Santa Rita, Río Piedras, PR 00925" },
       { fecha: "Dom 22 nov", lugar: "Día de Mercado · Conservatorio de Música de Puerto Rico", nota: "Miramar, San Juan" },
       { fecha: "Sáb 19 dic", lugar: "Verbena Navideña · Río Piedras", nota: "Plaza de la Convalecencia" }
     ]
   },
 
   // Cambia cada vez que se publica desde el panel (sirve para que los equipos usen el catálogo nuevo)
-  actualizado: "2026-11-19T21:10",
+  actualizado: "2026-11-19T21:15",
 
   // Texto que aparece arriba del catálogo de pedidos
   semana: "Menú del fin de semana · 21 y 22 de noviembre",
@@ -46,15 +46,15 @@ window.CACHANILLA = {
 
   // Días en que se pueden recoger pedidos (el cliente elige uno)
   diasPedido: [
-    { fecha: "2026-11-21", etiqueta: "Sábado 21 de noviembre · Panadería Mexicana La Cachanilla" },
+    { fecha: "2026-11-21", etiqueta: "Sábado 21 de noviembre · Panadería, Edificio 1109 Santa Rita, Río Piedras" },
     { fecha: "2026-11-22", etiqueta: "Domingo 22 de noviembre · Día de Mercado, Conservatorio de Música de PR" }
   ],
 
   // Noticias y novedades (la más reciente primero). Se editan en Panel → Noticias.
   noticias: [
     { fecha: "2026-11-19", titulo: "Este fin de semana: sábado y domingo",
-      texto: "El sábado 21 abrimos como Panadería Mexicana y el domingo 22 nos vemos en el Día de Mercado del Conservatorio de Música de Puerto Rico. ¡Aparta tu pan desde ya!",
-      img: "", enlace: "pedidos.html", boton: "Hacer mi pedido" },
+      texto: "El sábado 21 abrimos como Panadería Mexicana en el Edificio 1109 de Santa Rita, Río Piedras (PR 00925), y el domingo 22 nos vemos en el Día de Mercado del Conservatorio de Música de Puerto Rico. ¡Aparta tu pan desde ya!",
+      img: "", enlace: "https://www.google.com/maps/search/?api=1&query=1109+Santa+Rita+R%C3%ADo+Piedras+PR+00925", boton: "Cómo llegar el sábado" },
     { fecha: "2026-11-19", titulo: "Nuevo menú con roles, donas y niño envuelto",
       texto: "Llegan los roles de canela, donas (glaseado clásico, azucaradas o chocolate), empanadas, pericos, elotitos y cuernitos de pan fino, niño envuelto y champurrado de galleta.",
       img: "", enlace: "menu.html", boton: "Ver el menú" }
