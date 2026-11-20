@@ -72,15 +72,15 @@
     </div>
   </section>
 
-  <!-- VIDEO / INSTAGRAM -->
+  <!-- INSTAGRAM -->
   <section>
     <div class="wrap">
       <div class="titulo rev">
         <div class="cenefa"></div>
-        <h2>Míranos en acción</h2>
-        <p>Del horno a tus manos. Síguenos en Instagram <a id="igLink" target="_blank" rel="noopener"></a></p>
+        <h2>Lo nuevo en Instagram</h2>
+        <p>Del horno a tus manos. Síguenos en <a id="igLink" target="_blank" rel="noopener"></a></p>
       </div>
-      <div class="reels" id="reelsInicio"></div>
+      <div id="igInicio"></div>
       <p style="text-align:center;margin-top:30px"><a class="btn btn-borde" href="instagram.html">Ver más videos</a></p>
     </div>
   </section>
@@ -122,7 +122,7 @@
   $('#eventos').innerHTML = D.negocio.eventos.map(e => `
     <div class="evento rev"><div class="f">${esc(e.fecha)}</div><div><b>${esc(e.lugar)}</b><small>${esc(e.nota || '')}</small></div></div>`).join('');
   const ig = $('#igLink'); ig.href = 'https://instagram.com/' + D.negocio.instagram; ig.textContent = '@' + D.negocio.instagram;
-  pintarReels('#reelsInicio', 2, true);
+  pintarFeed('#igInicio', 6, () => { $('#igInicio').className = 'reels'; pintarReels('#igInicio', 2, true); });
   revelar();
 </script>
 </body>

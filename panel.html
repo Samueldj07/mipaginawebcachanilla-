@@ -34,6 +34,7 @@
     <nav class="tabs">
       <button data-v="resumen" class="on">Resumen</button>
       <button data-v="catalogo">Catálogo de la semana</button>
+      <button data-v="instagram">Instagram</button>
       <a href="admin.html">Administración</a>
       <a href="pos.html">Caja (POS)</a>
       <button class="salir" onclick="cerrarSesion()">Salir</button>
@@ -56,6 +57,35 @@
         <div class="caja"><h3>Ventas de los últimos 7 días</h3><div class="barras" id="barras"></div></div>
         <div class="caja"><h3>Más vendidos (7 días)</h3><div id="top"></div></div>
       </div>
+    </section>
+
+    <!-- INSTAGRAM -->
+    <section class="vista" id="instagram">
+      <h2>Instagram en la página</h2>
+      <p class="sub">Tus últimas publicaciones salen solas en la portada y en la página de Videos.</p>
+      <div class="dos">
+        <div class="caja">
+          <h3>Conectar tu Instagram (una vez)</h3>
+          <ol style="padding-left:18px;line-height:1.7;font-size:14px;margin:0 0 12px">
+            <li>Entra a <a href="https://behold.so" target="_blank" rel="noopener">behold.so</a> y crea una cuenta gratis (con el correo del negocio).</li>
+            <li><b>Connect Instagram</b> → entra con la cuenta de Instagram de La Cachanilla.</li>
+            <li><b>+ Add Feed</b> → elige <b>JSON</b> → nombre “Página web” → <b>Create feed</b>.</li>
+            <li>En los ajustes del feed, en <b>Domain whitelist</b>, añade <code>samueldj07.github.io</code>.</li>
+            <li>Copia la <b>Feed URL</b> (empieza con <code>https://feeds.behold.so/</code>) y pégala aquí abajo.</li>
+          </ol>
+          <label class="campo">Feed URL de Behold<input id="igFeedUrl" placeholder="https://feeds.behold.so/…" autocapitalize="none"></label>
+          <label class="campo">Usuario de Instagram (sin @)<input id="igUser" autocapitalize="none"></label>
+          <div class="fila"><button class="b b-sec" id="igProbar">Probar conexión</button><span id="igRes" class="sub" style="margin:0;font-size:14px"></span></div>
+        </div>
+        <div class="caja">
+          <h3>Reels destacados (opcional)</h3>
+          <p class="sub" style="font-size:14px">Para fijar videos en la página de Videos. Pega un enlace por línea, por ejemplo <code>https://www.instagram.com/reel/ABC123/</code></p>
+          <label class="campo"><textarea id="igReels" rows="5" style="width:100%"></textarea></label>
+          <div class="aviso" style="margin:0">Plan gratis de Behold: muestra 6 publicaciones, se actualiza 1 vez al día y permite 1,200 vistas al mes. La página guarda las publicaciones 6 horas en el celular de cada visitante para gastar menos vistas.</div>
+        </div>
+      </div>
+      <div class="fila"><span style="flex:1"></span><button class="b b-sec" id="igBajar">Descargar catalogo.js</button><button class="b b-rosa" id="igPublicar">Guardar y publicar</button></div>
+      <div id="igPrev" style="margin-top:18px"></div>
     </section>
 
     <!-- CATÁLOGO -->
@@ -163,7 +193,7 @@
     lista = catalogoActivo(); semana = window.CACHANILLA.semana; pintarCatalogo(); toast('Listo');
   };
   function textoCatalogo() {
-    const datos = Object.assign({}, window.CACHANILLA, { semana, productos: lista });
+    const datos = Object.assign({}, window.CACHANILLA, { semana, productos: lista, negocio: Object.assign({}, window.CACHANILLA.negocio, store.get('negocio_borrador', {})) });
     return `/* =====================================================================
    LA CACHANILLA · DATOS DEL NEGOCIO Y CATÁLOGO DE LA SEMANA
    Actualizado desde el Panel de dueños el ${new Date().toLocaleString('es-PR')}${s ? ' por ' + s.nombre : ''}.
@@ -188,12 +218,53 @@ window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
     b.disabled = false; b.textContent = 'Publicar en el sitio';
   };
 
+
+  /* ---------- Instagram ---------- */
+  const NEG = window.CACHANILLA.negocio;
+  const negDraft = () => Object.assign({ instagram: NEG.instagram, instagramFeed: NEG.instagramFeed || '', reels: NEG.reels || [] }, store.get('negocio_borrador', {}));
+  function pintarIG() {
+    const n = negDraft();
+    $('#igFeedUrl').value = n.instagramFeed; $('#igUser').value = n.instagram; $('#igReels').value = (n.reels || []).join('\n');
+  }
+  function leerIG() {
+    const feed = $('#igFeedUrl').value.trim(), user = $('#igUser').value.trim().replace(/^@/, '');
+    if (feed && !/^https:\/\/feeds\.behold\.so\/[\w-]+\/?$/.test(feed)) { toast('La Feed URL debe empezar con https://feeds.behold.so/', true); return null; }
+    if (!/^[\w.]{1,30}$/.test(user)) { toast('Usuario de Instagram no válido', true); return null; }
+    const reels = $('#igReels').value.split(/\s+/).map(x => x.trim()).filter(x => /^https:\/\/(www\.)?instagram\.com\/(reel|p|tv)\//.test(x));
+    return { instagram: user, instagramFeed: feed, reels };
+  }
+  $('#igProbar').onclick = async () => {
+    const n = leerIG(); if (!n) return;
+    if (!n.instagramFeed) return toast('Pega primero la Feed URL', true);
+    $('#igRes').textContent = 'Probando…';
+    try {
+      const r = await fetch(n.instagramFeed, { cache: 'no-cache' }); if (!r.ok) throw new Error(r.status);
+      const d = await r.json(); const posts = Array.isArray(d) ? d : (d.posts || []);
+      $('#igRes').innerHTML = `<b style="color:var(--hoja)">✓ Conectado</b> · @${esc(d.username || n.instagram)} · ${posts.length} publicaciones`;
+      if (d.username && d.username !== n.instagram) { $('#igUser').value = d.username; toast('Usuario actualizado a @' + d.username); }
+      $('#igPrev').innerHTML = '<div class="caja"><h3>Vista previa</h3><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">' +
+        posts.slice(0, 6).map(p => { const z = p.sizes || {}; const src = (z.small && z.small.mediaUrl) || p.thumbnailUrl || p.mediaUrl; return `<img src="${esc(src)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px">`; }).join('') + '</div></div>';
+    } catch (e) {
+      $('#igRes').innerHTML = '<b style="color:var(--rojo)">No se pudo leer el feed.</b> Revisa la URL y que el dominio esté en la whitelist (en este equipo puede fallar si no estás en el sitio publicado).';
+    }
+  };
+  $('#igBajar').onclick = () => { const n = leerIG(); if (!n) return; store.set('negocio_borrador', n); descargar('catalogo.js', textoCatalogo(), 'text/javascript;charset=utf-8'); };
+  $('#igPublicar').onclick = async () => {
+    const n = leerIG(); if (!n) return; store.set('negocio_borrador', n);
+    if (!ghConectado()) { toast('Guardado en este equipo. Para publicar, conecta GitHub en Administración o usa Descargar', true); return; }
+    const b = $('#igPublicar'); b.disabled = true; b.textContent = 'Publicando…';
+    try { await ghPublicar('assets/js/catalogo.js', textoCatalogo(), 'Actualizar Instagram de la página'); toast('Publicado. Se ve en la portada en 1 a 5 minutos'); }
+    catch (e) { toast('No se pudo publicar: ' + e.message, true); }
+    b.disabled = false; b.textContent = 'Guardar y publicar';
+  };
+
   /* ---------- Navegación ---------- */
   function ir(v) {
     $$('.tabs button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
     $$('.vista').forEach(x => x.classList.toggle('on', x.id === v));
     if (v === 'resumen') pintarResumen();
     if (v === 'catalogo') pintarCatalogo();
+    if (v === 'instagram') pintarIG();
     scrollTo(0, 0);
   }
   $$('.tabs button[data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));

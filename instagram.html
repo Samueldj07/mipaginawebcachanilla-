@@ -23,6 +23,7 @@
   <div class="cabeza"><h1>Videos</h1><p>Lo que pasa en nuestra cocina y en cada evento. Síguenos en <a id="ig" style="color:var(--amarillo)" target="_blank" rel="noopener"></a></p></div>
   <section>
     <div class="wrap">
+      <div id="igFeed" style="margin-bottom:40px"></div>
       <div class="reels" id="reels"></div>
       <p style="text-align:center;margin-top:36px"><a class="btn btn-rosa" id="igBtn" target="_blank" rel="noopener">Seguir en Instagram</a></p>
     </div>
@@ -35,7 +36,9 @@
 <script>
   const ig = window.CACHANILLA.negocio.instagram;
   $('#ig').textContent = '@' + ig; $('#ig').href = $('#igBtn').href = 'https://instagram.com/' + ig;
-  pintarReels('#reels', 6, true);
+  pintarFeed('#igFeed', 12,
+    () => { $('#igFeed').remove(); pintarReels('#reels', 6, true); },
+    () => pintarReels('#reels', 6, true, true));
 </script>
 </body>
 </html>
