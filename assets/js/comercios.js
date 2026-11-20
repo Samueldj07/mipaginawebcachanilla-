@@ -20,13 +20,15 @@
     clientes: [], pedidos: [], seq: { F: 0, R: 0 },
     factura: {
       nombre: 'La Cachanilla Repostería Mexicana', dir: 'Edificio 1109, Santa Rita, Río Piedras, PR 00925',
-      tel: '939-254-0736', correo: 'lacachanillamx@outlook.com', registro: '', ivu: 7,
+      tel: '939-254-0736', correo: 'lacachanillamx@outlook.com', registro: '', ivu: 11.5,
       pago: 'ATH Móvil 939-254-0736, efectivo o transferencia', pie: '¡Gracias por su preferencia! Un antojo mexicano, donde quiera que vayamos.'
     }
   };
   let D = Object.assign({}, JSON.parse(JSON.stringify(BASE)), store.get(KEY, {}));
   D.factura = Object.assign({}, BASE.factura, D.factura || {});
   D.seq = Object.assign({ F: 0, R: 0 }, D.seq || {});
+  // IVU regular 11.5% (10.5% estatal + 1% municipal), sin exención
+  if (!D.factura.mod || D.factura.ivu === 7) D.factura.ivu = 11.5;
 
   /* ---------- Cálculos ---------- */
   const totales = p => {
@@ -161,7 +163,7 @@
     $('#pCliente').value = c.nombre || ''; $('#pContacto').value = c.contacto || ''; $('#pTel').value = c.tel || '';
     $('#pCorreo').value = c.correo || ''; $('#pDir').value = c.dir || '';
     $('#pFecha').value = borrador.fecha || hoyISO(); $('#pEntrega').value = borrador.entrega || hoyISO();
-    $('#pTerminos').value = String(borrador.terminos ?? 15); $('#pExento').checked = !!borrador.exento; $('#pNotas').value = borrador.notas || '';
+    $('#pTerminos').value = String(borrador.terminos ?? 15); $('#pNotas').value = borrador.notas || '';
     $('#pGuardarPagado').style.display = p ? 'none' : '';
     $('#pGuardar').textContent = p ? 'Guardar cambios' : 'Guardar y crear factura';
     $('#dlClientes').innerHTML = D.clientes.filter(x => !x.inactivo).map(x => `<option value="${esc(x.nombre)}">`).join('');
@@ -178,10 +180,10 @@
     pintarTotalesForm();
   }
   function pintarTotalesForm() {
-    borrador.exento = $('#pExento').checked; borrador.tasa = D.factura.ivu;
+    borrador.exento = false; borrador.tasa = D.factura.ivu;
     const t = totales({ ...borrador, pagos: [] });
     $('#pTotales').innerHTML = `<div class="r"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
-      <div class="r"><span>IVU ${borrador.exento ? '(exento)' : '(' + D.factura.ivu + '%)'}</span><span>${money(t.ivu)}</span></div>
+      <div class="r"><span>IVU (${D.factura.ivu}%)</span><span>${money(t.ivu)}</span></div>
       <div class="r big"><span>Total</span><span>${money(t.total)}</span></div>`;
   }
   $('#pLineas').addEventListener('input', e => {
@@ -198,11 +200,10 @@
     sel.value = ''; pintarLineas();
   };
   $('#pLibre').onclick = () => { borrador.lineas.push({ nombre: '', precio: 0, q: 1 }); pintarLineas(); $$('#pLineas [data-k=nombre]').pop().focus(); };
-  $('#pExento').onchange = pintarTotalesForm;
   $('#pCliente').onchange = () => {
     const c = D.clientes.find(x => x.nombre.toLowerCase() === $('#pCliente').value.trim().toLowerCase()); if (!c) return;
     $('#pContacto').value = c.contacto || ''; $('#pTel').value = c.tel || ''; $('#pCorreo').value = c.correo || ''; $('#pDir').value = c.dir || '';
-    $('#pExento').checked = !!c.exento; if (c.terminos != null) $('#pTerminos').value = String(c.terminos); pintarTotalesForm();
+    if (c.terminos != null) $('#pTerminos').value = String(c.terminos); pintarTotalesForm();
   };
   $('#pCancelar').onclick = () => { editando = null; sub('pedidos'); };
 
@@ -217,7 +218,7 @@
     const terminos = Number($('#pTerminos').value), fecha = $('#pFecha').value || hoyISO(), entrega = $('#pEntrega').value || fecha;
     return {
       cliente: { nombre, contacto: $('#pContacto').value.trim(), tel: soloDigitosTel($('#pTel').value), correo: normalizar(correo), dir: $('#pDir').value.trim() },
-      fecha, entrega, terminos, vence: sumarDias(entrega, terminos), exento: $('#pExento').checked, tasa: Number(D.factura.ivu),
+      fecha, entrega, terminos, vence: sumarDias(entrega, terminos), exento: false, tasa: Number(D.factura.ivu),
       lineas: lineas.map(l => ({ nombre: String(l.nombre).trim(), q: Number(l.q), precio: r2(Number(l.precio)) })), notas: $('#pNotas').value.trim()
     };
   }
@@ -239,7 +240,7 @@
       p = Object.assign({ id: uid(), num: 'F-' + String(D.seq.F).padStart(4, '0'), creado: ahora(), mod: ahora(), por: yoNombre(), pagos: [], recordatorios: [] }, f);
       D.pedidos.push(p);
     }
-    p.clienteId = recordarCliente(f.cliente, { exento: f.exento, terminos: f.terminos });
+    p.clienteId = recordarCliente(f.cliente, { terminos: f.terminos });
     editando = null; guardar(); sub('pedidos');
     toast('Pedido guardado · factura ' + p.num);
     verDocumento(p.id);
@@ -416,7 +417,7 @@
       return { c, n: ps.length, comprado: ps.reduce((s, p) => s + totales(p).total, 0), debe: ps.reduce((s, p) => s + Math.max(0, totales(p).saldo), 0) };
     }).sort((a, b) => b.debe - a.debe || b.comprado - a.comprado);
     $('#cliLista').innerHTML = filas.length ? `<div class="tabla"><table><thead><tr><th>Comercio</th><th>Contacto</th><th class="n">Pedidos</th><th class="n">Comprado</th><th class="n">Debe</th><th></th></tr></thead><tbody>${
-      filas.map(({ c, n, comprado, debe }) => `<tr><td><b>${esc(c.nombre)}</b>${c.exento ? ' <span class="est pagada">exento</span>' : ''}<br><small style="color:var(--gris)">${esc(c.dir || '')}</small></td>
+      filas.map(({ c, n, comprado, debe }) => `<tr><td><b>${esc(c.nombre)}</b><br><small style="color:var(--gris)">${esc(c.dir || '')}</small></td>
         <td>${esc(c.contacto || '')}<br><small>${c.tel ? '+' + esc(c.tel) : ''} ${esc(c.correo || '')}</small></td>
         <td class="n">${n}</td><td class="n">${money(comprado)}</td><td class="n" style="${debe > 0.004 ? 'color:var(--rojo);font-weight:800' : ''}">${money(debe)}</td>
         <td class="n"><button class="b b-sec" style="padding:6px 10px" data-pedirpara="${c.id}">Nuevo pedido</button> <button class="b b-rojo" style="padding:6px 10px" data-ocultar="${c.id}" title="Quitar de la lista">✕</button></td></tr>`).join('')}</tbody></table></div>`

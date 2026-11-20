@@ -55,7 +55,7 @@ Configúralo en **Panel → Instagram**: crea el feed JSON en Behold, añade `sa
 Si no hay feed, la portada muestra los reels fijados o los espacios de video.
 
 ## Pedidos de comercios (Administración → Comercios)
-- Pedidos a negocios con productos del menú o líneas libres, precio editable, términos (contado, 7, 15 o 30 días) y exención de IVU para revendedores.
+- Pedidos a negocios con productos del menú o líneas libres, precio editable, términos (contado, 7, 15 o 30 días) e IVU regular de 11.5% (sin exención).
 - **Factura** (F-0001…) para quien recibió y no ha pagado; al registrar un pago se crea el **Recibo** (R-0001…) y la factura queda como *Pagada* o *Pago parcial*.
 - **Recordatorios de pago**: facturas por cobrar ordenadas por vencimiento, con mensaje listo para WhatsApp o correo.
 - Documentos imprimibles / PDF con el logo.
