@@ -23,6 +23,7 @@ Sitio web de La Cachanilla con diseño inspirado en la talavera poblana, página
 1. En GitHub: **Settings → Pages**.
 2. En *Source* elige **Deploy from a branch**, rama `main`, carpeta `/ (root)` → **Save**.
 3. En 1–2 minutos el sitio queda en `https://samueldj07.github.io/mipaginawebcachanilla-/`.
+4. Dominio propio: **https://lacachanillamx.com** (Settings → Pages → Custom domain; DNS en Porkbun con 4 registros A a 185.199.108.153, .109.153, .110.153, .111.153 y CNAME `www` → `samueldj07.github.io`).
 
 ## Lo primero que hay que cambiar
 En `assets/js/catalogo.js`:
@@ -51,7 +52,7 @@ La caja (POS) muestra solo el menú de la semana y pide el sabor cuando el produ
 
 ## Instagram en la portada
 Las últimas publicaciones salen solas en la portada y en Videos usando **Behold** (behold.so, plan gratis: 6 publicaciones, se actualiza 1 vez al día, 1,200 vistas/mes).
-Configúralo en **Panel → Instagram**: crea el feed JSON en Behold, añade `samueldj07.github.io` a la *Domain whitelist*, pega la Feed URL y pulsa *Guardar y publicar*.
+Configúralo en **Panel → Instagram**: crea el feed JSON en Behold, añade `lacachanillamx.com` y `www.lacachanillamx.com` a la *Domain whitelist*, pega la Feed URL y pulsa *Guardar y publicar*.
 Si no hay feed, la portada muestra los reels fijados o los espacios de video.
 
 ## Pedidos de comercios (Administración → Comercios)
