@@ -1,48 +1,69 @@
 /* =====================================================================
-   La Cachanilla · Acceso de dueños
+   La Cachanilla · Acceso al área privada
    ---------------------------------------------------------------------
    ⚠️ IMPORTANTE: este sitio es estático (GitHub Pages). Este acceso
    esconde el panel a clientes y curiosos, pero NO es seguridad de
    banco: alguien con conocimientos técnicos puede leer el código.
    No guardes aquí datos sensibles (números de tarjeta, cuentas, etc.).
-   Las ventas del POS se guardan solo en el equipo donde se hacen.
 
-   Para cambiar usuario/contraseña: Panel → "Seguridad" genera la línea
-   nueva para pegar aquí abajo.
+   Las cuentas viven en assets/js/cuentas.js (se manejan desde
+   Panel → Cuentas). Este archivo debe cargarse DESPUÉS de cuentas.js.
    ===================================================================== */
-const USUARIOS = [
-  // Usuario y contraseña temporales: los tienen los dueños. ¡Cámbialos en Panel → Seguridad!
-  { usuario: 'cachanilla', hash: '923b8ad1f573fb1aa1cf1b1464eacaa41b94738f6e89d7acdebb3d206d401d5a' },
-];
-
 const SESION_KEY = 'cach_sesion';
 const SESION_HORAS = 12;
+const cuentasActivas = () => ((window.CUENTAS && window.CUENTAS.usuarios) || []).filter(c => !c.inactiva);
 
 async function sha256(texto) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(texto));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
-const hashCredencial = (u, p) => sha256(u.trim().toLowerCase() + '::' + p);
+const normalizar = u => String(u || '').trim().toLowerCase();
+const hashCredencial = (u, p) => sha256(normalizar(u) + '::' + p);
 
-async function iniciarSesion(usuario, clave) {
-  const h = await hashCredencial(usuario, clave);
-  const ok = USUARIOS.find(x => x.usuario === usuario.trim().toLowerCase() && x.hash === h);
-  if (!ok) return false;
-  const s = { u: ok.usuario, exp: Date.now() + SESION_HORAS * 36e5 };
+function buscarCuenta(id) {
+  const x = normalizar(id);
+  return cuentasActivas().find(c => normalizar(c.usuario) === x || (c.correo && normalizar(c.correo) === x));
+}
+async function iniciarSesion(id, clave) {
+  const c = buscarCuenta(id);
+  if (!c) return false;
+  if ((await hashCredencial(c.usuario, clave)) !== c.hash) return false;
+  const s = { u: c.usuario, nombre: c.nombre || c.usuario, rol: c.rol || 'cajero', exp: Date.now() + SESION_HORAS * 36e5 };
   try { sessionStorage.setItem(SESION_KEY, JSON.stringify(s)); localStorage.setItem(SESION_KEY, JSON.stringify(s)); } catch (e) {}
-  return true;
+  return s;
 }
 function sesionActual() {
   try {
     const s = JSON.parse(sessionStorage.getItem(SESION_KEY) || localStorage.getItem(SESION_KEY) || 'null');
-    if (s && s.exp > Date.now() && USUARIOS.some(x => x.usuario === s.u)) return s;
-  } catch (e) {}
-  return null;
+    if (!s || s.exp < Date.now()) return null;
+    const c = cuentasActivas().find(x => x.usuario === s.u);
+    if (!c) return null;                       // cuenta borrada o desactivada
+    s.rol = c.rol || 'cajero'; s.nombre = c.nombre || c.usuario;
+    return s;
+  } catch (e) { return null; }
 }
 function cerrarSesion() {
   try { sessionStorage.removeItem(SESION_KEY); localStorage.removeItem(SESION_KEY); } catch (e) {}
   location.replace('acceso.html');
 }
-function requerirSesion() {
-  if (!sesionActual()) location.replace('acceso.html?volver=' + encodeURIComponent(location.pathname.split('/').pop()));
+/* rol: 'dueño' exige cuenta de dueño; sin rol basta cualquier cuenta */
+function requerirSesion(rol) {
+  const s = sesionActual();
+  if (!s) { location.replace('acceso.html?volver=' + encodeURIComponent(location.pathname.split('/').pop() + location.hash)); return; }
+  if (rol === 'dueño' && s.rol !== 'dueño') location.replace('pos.html');
 }
+
+/* ---------- Solicitudes de cuenta (código que viaja por WhatsApp/correo) ---------- */
+function codificarSolicitud(obj) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodificarSolicitud(code) {
+  try {
+    const b = String(code).trim().replace(/^.*#aprobar=/, '').replace(/-/g, '+').replace(/_/g, '/');
+    const o = JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4)))));
+    if (!o.c || !/^[0-9a-f]{64}$/.test(o.h) || !o.n) return null;
+    return o;
+  } catch (e) { return null; }
+}
+const urlSitio = () => location.href.replace(/[^/]*([?#].*)?$/, '');
+const soloDigitosTel = t => { let n = String(t || '').replace(/\D/g, ''); if (n.length === 10) n = '1' + n; return n; };

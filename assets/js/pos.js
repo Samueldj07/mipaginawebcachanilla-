@@ -300,3 +300,7 @@ $('#cCsv').onclick = csvCierre;
 window.addEventListener('storage', e => { if (e.key === 'cach_catalogo_borrador') { productos = catalogoActivo(); pintarCatalogo(); } });
 
 pintarCatalogo(); pintarOrden();
+
+/* Cajeros no ven el enlace al panel */
+(() => { const s = sesionActual(); if (s && s.rol !== 'dueño') $$('a[href="panel.html"]').forEach(a => a.style.display = 'none');
+  const m = $('.adm-top .marca'); if (m && s && s.rol !== 'dueño') m.removeAttribute('href'); })();

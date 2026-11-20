@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Solicitar acceso · La Cachanilla</title>
+<link rel="icon" href="assets/img/talavera.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<style>
+  .caja-login{width:min(480px,100%)}
+  .pasos{display:none}
+  .paso{display:flex;gap:12px;align-items:flex-start;margin:14px 0}
+  .paso i{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;background:var(--cobalto);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .paso .btn{width:100%;justify-content:center;margin-top:6px}
+  .hecho{background:var(--hoja) !important}
+</style>
+</head>
+<body>
+<main class="acceso">
+  <div class="caja-login">
+    <a class="logo" href="index.html" style="justify-content:center"><i></i><span>La Cachanilla<small>Solicitar acceso</small></span></a>
+
+    <form class="form" id="f">
+      <p class="nota" style="text-align:center;margin:6px 0 4px">Para personal del negocio. Los dueños aprueban cada cuenta.</p>
+      <label for="n">Nombre completo *</label>
+      <input id="n" required autocomplete="name">
+      <label for="c">Correo electrónico * <span class="nota">(será tu usuario)</span></label>
+      <input id="c" type="email" required autocomplete="email" autocapitalize="none">
+      <label for="w">WhatsApp *</label>
+      <input id="w" type="tel" required autocomplete="tel" placeholder="787-000-0000">
+      <label for="r">Tipo de acceso</label>
+      <select id="r">
+        <option value="cajero">Cajero/a — solo la caja (POS)</option>
+        <option value="dueño">Dueño/a — panel completo</option>
+      </select>
+      <label for="p1">Crea tu contraseña * <span class="nota">(mínimo 10 caracteres)</span></label>
+      <input id="p1" type="password" required minlength="10" autocomplete="new-password">
+      <label for="p2">Repite la contraseña *</label>
+      <input id="p2" type="password" required minlength="10" autocomplete="new-password">
+      <label for="m">Mensaje para los dueños</label>
+      <input id="m" placeholder="Ej. Soy Ana, ayudo en la caja los sábados">
+      <button class="btn btn-azul" style="width:100%;justify-content:center;margin-top:16px">Preparar solicitud</button>
+      <div class="error" id="err"></div>
+      <p class="nota" style="text-align:center;margin-top:12px">Tu contraseña no se envía a nadie: solo viaja una huella cifrada para poder verificarla.</p>
+    </form>
+
+    <div class="pasos" id="pasos">
+      <h2 style="text-align:center;font-size:24px;margin-top:10px">Envía tu solicitud</h2>
+      <p class="nota" style="text-align:center">Los dueños la aprueban con un toque. Te avisaremos por WhatsApp y correo.</p>
+      <div class="paso"><i>1</i><div style="flex:1"><b>Por WhatsApp</b><a class="btn btn-rosa" id="bWa" target="_blank" rel="noopener">Enviar por WhatsApp</a></div></div>
+      <div class="paso" id="pasoCorreo"><i>2</i><div style="flex:1"><b>Por correo</b><a class="btn btn-borde" id="bMail">Enviar por correo</a></div></div>
+      <p class="nota" style="margin-top:16px">Cuando te aprueben, entra en <a href="acceso.html">Acceso</a> con tu correo y la contraseña que creaste.</p>
+    </div>
+    <p style="text-align:center;margin:14px 0 0"><a href="acceso.html">← Ya tengo cuenta</a></p>
+  </div>
+</main>
+<script src="assets/js/cuentas.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  const q = s => document.querySelector(s);
+  const C = window.CUENTAS;
+  const fallo = t => { q('#err').textContent = t; q('#err').classList.add('on'); };
+
+  q('#f').addEventListener('submit', async e => {
+    e.preventDefault(); q('#err').classList.remove('on');
+    const n = q('#n').value.trim(), c = normalizar(q('#c').value), w = soloDigitosTel(q('#w').value);
+    const p1 = q('#p1').value, p2 = q('#p2').value, r = q('#r').value, m = q('#m').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c)) return fallo('Escribe un correo válido.');
+    if (w.length < 11) return fallo('Escribe tu número de WhatsApp completo (10 dígitos).');
+    if (p1.length < 10) return fallo('La contraseña debe tener al menos 10 caracteres.');
+    if (p1 !== p2) return fallo('Las contraseñas no coinciden.');
+    if (buscarCuenta(c)) return fallo('Ya existe una cuenta con ese correo. Entra en Acceso.');
+
+    const sol = { n, c, w, r, m, h: await hashCredencial(c, p1), t: Date.now() };
+    const enlace = urlSitio() + 'panel.html#aprobar=' + codificarSolicitud(sol);
+    const rolTxt = r === 'dueño' ? 'Dueño/a (panel completo)' : 'Cajero/a (solo caja)';
+    const texto = [
+      '🔐 Solicitud de cuenta · La Cachanilla', '',
+      `Nombre: ${n}`, `Correo: ${c}`, `WhatsApp: +${w}`, `Acceso: ${rolTxt}`, m ? `Mensaje: ${m}` : '', '',
+      'Para aprobar o rechazar, abre este enlace (entra con tu cuenta de dueño):', enlace
+    ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
+
+    q('#bWa').href = `https://wa.me/${C.whatsappDueno}?text=${encodeURIComponent(texto)}`;
+    if (C.correoDueno) q('#bMail').href = `mailto:${C.correoDueno}?subject=${encodeURIComponent('Solicitud de cuenta: ' + n)}&body=${encodeURIComponent(texto)}`;
+    else q('#pasoCorreo').style.display = 'none';
+    [q('#bWa'), q('#bMail')].forEach(b => b.addEventListener('click', () => { b.classList.add('hecho'); b.textContent = '✓ ' + b.textContent.replace(/^✓ /, ''); }));
+    q('#p1').value = q('#p2').value = '';
+    q('#f').style.display = 'none'; q('#pasos').style.display = 'block';
+  });
+</script>
+</body>
+</html>

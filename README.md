@@ -11,8 +11,9 @@ Sitio web de La Cachanilla con diseño inspirado en la talavera poblana, página
 | Haz tu pedido (catálogo de la semana) | `pedidos.html` | Clientes — el pedido llega por WhatsApp |
 | Nosotros + galería | `nosotros.html` | Clientes |
 | Videos de Instagram | `instagram.html` | Clientes |
-| Acceso dueños | `acceso.html` | Dueños (usuario y contraseña) |
-| Panel de dueños | `panel.html` | Dueños: resumen de ventas, catálogo de la semana, seguridad |
+| Acceso | `acceso.html` | Equipo (correo o usuario + contraseña) |
+| Solicitar acceso | `registro.html` | Personal nuevo: la solicitud llega al WhatsApp y correo de los dueños |
+| Panel de dueños | `panel.html` | Dueños: resumen de ventas, catálogo de la semana, cuentas |
 | Caja (POS) | `pos.html` | Dueños: cobrar, recibos, cierre del día, CSV |
 
 ## Publicar gratis con GitHub Pages
@@ -26,9 +27,16 @@ En `assets/js/catalogo.js`:
 - `instagram`: confirmar el usuario exacto.
 - `reels`: pegar los enlaces de los reels de Instagram.
 
-En `assets/js/auth.js`: **cambiar la contraseña temporal** (Panel → Seguridad te genera la línea).
+En Panel → Cuentas: **cambiar la contraseña temporal** y poner el correo principal de los dueños.
 
 El usuario y la contraseña temporales se entregaron a los dueños por privado (no se escriben aquí porque el repositorio es público).
+
+## Cuentas del equipo
+- **Alguien pide acceso:** entra a `registro.html` (enlace en la página de Acceso), llena sus datos y crea su contraseña. Con dos botones envía la solicitud al WhatsApp y al correo principal de los dueños. El mensaje trae un enlace de aprobación.
+- **El dueño aprueba:** toca el enlace → entra con su cuenta → *Aprobar* o *Rechazar* → avisa a la persona por WhatsApp y correo con un toque.
+- **El dueño crea una cuenta directamente:** Panel → Cuentas → *Crear cuenta*.
+- **Para activar los cambios:** Panel → Cuentas → *Descargar cuentas.js* → súbelo a GitHub en `assets/js/`.
+- Accesos: **Dueño/a** (panel + caja) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
 
 ## Fotos y video (espacios listos)
 Sube las fotos con estos nombres y aparecen solas:
