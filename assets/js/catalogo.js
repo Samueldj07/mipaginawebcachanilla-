@@ -17,6 +17,9 @@ window.CACHANILLA = {
     // 1 + 939 + número.
     whatsapp: "19392540736",
     instagram: "lacachanilla.mxdulce",          // ⚠️ Confirmar el usuario exacto de Instagram
+    // Publicaciones automáticas en la portada: URL del feed JSON de Behold (behold.so)
+    // ej. "https://feeds.behold.so/AbCdEf123456". Se configura en Panel → Instagram.
+    instagramFeed: "",
     correo: "",
     zona: "San Juan, Puerto Rico",
     // Videos/reels de Instagram: pega aquí los enlaces de las publicaciones

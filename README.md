@@ -41,6 +41,11 @@ Solo los **Administradores/as** (dueños) entran. Cualquiera de ellos puede auto
 - Sin conexión: descarga `cuentas.js` y súbelo a GitHub en `assets/js/`.
 - Accesos: **Administrador/a** (panel, administración y caja) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
 
+## Instagram en la portada
+Las últimas publicaciones salen solas en la portada y en Videos usando **Behold** (behold.so, plan gratis: 6 publicaciones, se actualiza 1 vez al día, 1,200 vistas/mes).
+Configúralo en **Panel → Instagram**: crea el feed JSON en Behold, añade `samueldj07.github.io` a la *Domain whitelist*, pega la Feed URL y pulsa *Guardar y publicar*.
+Si no hay feed, la portada muestra los reels fijados o los espacios de video.
+
 ## Fotos y video (espacios listos)
 Sube las fotos con estos nombres y aparecen solas:
 - `assets/img/portada.jpg` — foto grande del inicio (cuadrada)
