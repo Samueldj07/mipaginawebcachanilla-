@@ -6,13 +6,13 @@
    assets/js/ (reemplazando este). En 1–2 minutos las cuentas quedan activas.
 
    Las contraseñas NO se guardan: solo una huella (hash) imposible de leer.
-   rol "dueño"  → Panel completo + Caja
+   rol "dueño"  → Administrador: Panel, Administración (autoriza cuentas) y Caja
    rol "cajero" → solo Caja (POS)
    ===================================================================== */
 window.CUENTAS = {
-  // Aquí llegan las solicitudes de cuenta nuevas
-  whatsappDueno: "19392540736",
-  correoDueno: "spm.biokinet@gmail.com",   // Temporal: cambiar al correo de La Cachanilla cuando exista
+  // Aquí llegan las solicitudes de cuenta nuevas (cualquier administrador puede aprobarlas)
+  whatsappDuenos: ["19392540736"],
+  correosDuenos: ["lacachanillamx@outlook.com", "spm.biokinet@gmail.com"],
 
   usuarios: [
     { usuario: "cachanilla", nombre: "Dueños La Cachanilla", correo: "", whatsapp: "19392540736", rol: "dueño", alta: "2026-11-19",

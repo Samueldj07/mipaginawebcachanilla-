@@ -57,13 +57,24 @@ function requerirSesion(rol) {
 function codificarSolicitud(obj) {
   return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
-function decodificarSolicitud(code) {
+function decodificarCodigo(code) {
   try {
-    const b = String(code).trim().replace(/^.*#aprobar=/, '').replace(/-/g, '+').replace(/_/g, '/');
-    const o = JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4)))));
-    if (!o.c || !/^[0-9a-f]{64}$/.test(o.h) || !o.n) return null;
-    return o;
+    const b = String(code).trim().replace(/^.*#(aprobar|inv)=/, '').replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(decodeURIComponent(escape(atob(b + '==='.slice((b.length + 3) % 4)))));
   } catch (e) { return null; }
+}
+function decodificarSolicitud(code) {
+  const o = decodificarCodigo(code);
+  return o && o.c && o.n && /^[0-9a-f]{64}$/.test(o.h || '') ? o : null;
+}
+function decodificarInvitacion(code) {
+  const o = decodificarCodigo(code);
+  return o && o.c && o.n && o.inv ? o : null;
 }
 const urlSitio = () => location.href.replace(/[^/]*([?#].*)?$/, '');
 const soloDigitosTel = t => { let n = String(t || '').replace(/\D/g, ''); if (n.length === 10) n = '1' + n; return n; };
+/* Destinos donde llegan las solicitudes (admite el formato anterior de un solo número/correo) */
+function destinosSolicitud(C = window.CUENTAS || {}) {
+  const lista = (a, b) => [...new Set([].concat(a || [], b ? [b] : []).map(x => String(x).trim()).filter(Boolean))];
+  return { whatsapps: lista(C.whatsappDuenos, C.whatsappDueno).map(soloDigitosTel), correos: lista(C.correosDuenos, C.correoDueno).map(normalizar) };
+}

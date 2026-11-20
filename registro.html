@@ -26,7 +26,7 @@
     <p class="area">Solicitar acceso</p>
 
     <form class="form" id="f">
-      <p class="nota" style="text-align:center;margin:6px 0 4px">Para personal del negocio. Los dueños aprueban cada cuenta.</p>
+      <p class="nota" style="text-align:center;margin:6px 0 4px" id="intro">Para personal del negocio. Un administrador aprueba cada cuenta.</p>
       <label for="n">Nombre completo *</label>
       <input id="n" required autocomplete="name">
       <label for="c">Correo electrónico * <span class="nota">(será tu usuario)</span></label>
@@ -36,7 +36,7 @@
       <label for="r">Tipo de acceso</label>
       <select id="r">
         <option value="cajero">Cajero/a — solo la caja (POS)</option>
-        <option value="dueño">Dueño/a — panel completo</option>
+        <option value="dueño">Administrador/a (dueño) — panel completo y autoriza cuentas</option>
       </select>
       <label for="p1">Crea tu contraseña * <span class="nota">(mínimo 10 caracteres)</span></label>
       <input id="p1" type="password" required minlength="10" autocomplete="new-password">
@@ -52,8 +52,8 @@
     <div class="pasos" id="pasos">
       <h2 style="text-align:center;font-size:24px;margin-top:10px">Envía tu solicitud</h2>
       <p class="nota" style="text-align:center">Los dueños la aprueban con un toque. Te avisaremos por WhatsApp y correo.</p>
-      <div class="paso"><i>1</i><div style="flex:1"><b>Por WhatsApp</b><a class="btn btn-rosa" id="bWa" target="_blank" rel="noopener">Enviar por WhatsApp</a></div></div>
-      <div class="paso" id="pasoCorreo"><i>2</i><div style="flex:1"><b>Por correo</b><a class="btn btn-borde" id="bMail">Enviar por correo</a></div></div>
+      <div class="paso"><i>1</i><div style="flex:1"><b>Por WhatsApp</b><div id="bWas"></div></div></div>
+      <div class="paso" id="pasoCorreo"><i>2</i><div style="flex:1"><b>Por correo</b> <span class="nota" id="correosTxt"></span><a class="btn btn-borde" id="bMail">Enviar por correo</a></div></div>
       <p class="nota" style="margin-top:16px">Cuando te aprueben, entra en <a href="acceso.html">Acceso</a> con tu correo y la contraseña que creaste.</p>
     </div>
     <p style="text-align:center;margin:14px 0 0"><a href="acceso.html">← Ya tengo cuenta</a></p>
@@ -66,6 +66,19 @@
   const C = window.CUENTAS;
   const fallo = t => { q('#err').textContent = t; q('#err').classList.add('on'); };
 
+  const inv = location.hash.startsWith('#inv=') ? decodificarInvitacion(location.hash) : null;
+  if (inv) {
+    if (inv.exp && inv.exp < Date.now()) {
+      q('#intro').innerHTML = '<b style="color:#b3261e">Esta invitación expiró.</b> Pide una nueva o llena la solicitud normal.';
+    } else {
+      q('#intro').innerHTML = `<b>${esc(inv.por || 'Un administrador')}</b> te invitó como <b>${inv.r === 'dueño' ? 'Administrador/a' : 'Cajero/a'}</b>. Solo crea tu contraseña.`;
+      q('#n').value = inv.n; q('#c').value = inv.c; q('#c').readOnly = true;
+      if (inv.w) q('#w').value = inv.w.replace(/^1(?=\d{10}$)/, '');
+      q('#r').value = inv.r; q('#r').disabled = true;
+    }
+  }
+  function esc(t) { return String(t || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
   q('#f').addEventListener('submit', async e => {
     e.preventDefault(); q('#err').classList.remove('on');
     const n = q('#n').value.trim(), c = normalizar(q('#c').value), w = soloDigitosTel(q('#w').value);
@@ -74,21 +87,26 @@
     if (w.length < 11) return fallo('Escribe tu número de WhatsApp completo (10 dígitos).');
     if (p1.length < 10) return fallo('La contraseña debe tener al menos 10 caracteres.');
     if (p1 !== p2) return fallo('Las contraseñas no coinciden.');
-    if (buscarCuenta(c)) return fallo('Ya existe una cuenta con ese correo. Entra en Acceso.');
+    if (buscarCuenta(c) && !inv) return fallo('Ya existe una cuenta con ese correo. Entra en Acceso.');
 
     const sol = { n, c, w, r, m, h: await hashCredencial(c, p1), t: Date.now() };
-    const enlace = urlSitio() + 'panel.html#aprobar=' + codificarSolicitud(sol);
-    const rolTxt = r === 'dueño' ? 'Dueño/a (panel completo)' : 'Cajero/a (solo caja)';
+    if (inv) sol.inv = { por: inv.por || '', t: inv.t };
+    const enlace = urlSitio() + 'admin.html#aprobar=' + codificarSolicitud(sol);
+    const rolTxt = r === 'dueño' ? 'Administrador/a (dueño)' : 'Cajero/a (solo caja)';
     const texto = [
-      '🔐 Solicitud de cuenta · La Cachanilla', '',
-      `Nombre: ${n}`, `Correo: ${c}`, `WhatsApp: +${w}`, `Acceso: ${rolTxt}`, m ? `Mensaje: ${m}` : '', '',
-      'Para aprobar o rechazar, abre este enlace (entra con tu cuenta de dueño):', enlace
+      inv ? '🔐 Invitación aceptada · La Cachanilla' : '🔐 Solicitud de cuenta · La Cachanilla', '',
+      `Nombre: ${n}`, `Correo: ${c}`, `WhatsApp: +${w}`, `Acceso: ${rolTxt}`, inv ? `Invitado por: ${inv.por || 'administrador'}` : '', m ? `Mensaje: ${m}` : '', '',
+      'Cualquier administrador puede aprobarla aquí (entra con tu cuenta):', enlace
     ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
 
-    q('#bWa').href = `https://wa.me/${C.whatsappDueno}?text=${encodeURIComponent(texto)}`;
-    if (C.correoDueno) q('#bMail').href = `mailto:${C.correoDueno}?subject=${encodeURIComponent('Solicitud de cuenta: ' + n)}&body=${encodeURIComponent(texto)}`;
-    else q('#pasoCorreo').style.display = 'none';
-    [q('#bWa'), q('#bMail')].forEach(b => b.addEventListener('click', () => { b.classList.add('hecho'); b.textContent = '✓ ' + b.textContent.replace(/^✓ /, ''); }));
+    const D = destinosSolicitud();
+    q('#bWas').innerHTML = D.whatsapps.map((num, i) =>
+      `<a class="btn btn-rosa" target="_blank" rel="noopener" href="https://wa.me/${num}?text=${encodeURIComponent(texto)}">Enviar por WhatsApp${D.whatsapps.length > 1 ? ' #' + (i + 1) : ''}</a>`).join('');
+    if (D.correos.length) {
+      q('#bMail').href = `mailto:${D.correos.join(',')}?subject=${encodeURIComponent((inv ? 'Invitación aceptada: ' : 'Solicitud de cuenta: ') + n)}&body=${encodeURIComponent(texto)}`;
+      q('#correosTxt').textContent = '(' + D.correos.join(' y ') + ')';
+    } else q('#pasoCorreo').style.display = 'none';
+    document.querySelectorAll('#pasos .btn').forEach(b => b.addEventListener('click', () => { b.classList.add('hecho'); if (!b.textContent.startsWith('✓')) b.textContent = '✓ ' + b.textContent; }));
     q('#p1').value = q('#p2').value = '';
     q('#f').style.display = 'none'; q('#pasos').style.display = 'block';
   });
