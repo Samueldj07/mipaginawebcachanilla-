@@ -15,22 +15,25 @@
   <form class="caja-login form" id="f">
     <a class="logo" href="index.html"><i></i><span>La Cachanilla<small>Área de dueños</small></span></a>
     <p class="nota" style="text-align:center;margin:4px 0 8px">Panel de administración y caja (POS)</p>
-    <label for="u">Usuario</label>
-    <input id="u" autocomplete="username" required autocapitalize="none">
+    <label for="u">Correo o usuario</label>
+    <input id="u" autocomplete="username" required autocapitalize="none" inputmode="email">
     <label for="p">Contraseña</label>
     <input id="p" type="password" autocomplete="current-password" required>
     <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input type="checkbox" id="ver" style="width:auto"> Mostrar contraseña</label>
     <button class="btn btn-azul" style="width:100%;justify-content:center;margin-top:14px" id="b">Entrar</button>
     <div class="error" id="err"></div>
-    <p style="text-align:center;margin:18px 0 0"><a href="index.html">← Volver al sitio</a></p>
+    <p style="text-align:center;margin:16px 0 0;font-size:14px">¿Trabajas con nosotros y no tienes cuenta? <a href="registro.html">Solicitar acceso</a></p>
+    <p style="text-align:center;margin:8px 0 0"><a href="index.html">← Volver al sitio</a></p>
   </form>
 </main>
+<script src="assets/js/cuentas.js"></script>
 <script src="assets/js/auth.js"></script>
 <script>
   const q = s => document.querySelector(s);
   const volver = new URLSearchParams(location.search).get('volver');
-  const destino = /^[\w-]+\.html$/.test(volver || '') ? volver : 'panel.html';
-  if (sesionActual()) location.replace(destino);
+  const destino = /^[\w-]+\.html(#[\w=-]*)?$/.test(volver || '') ? volver : 'panel.html';
+  const ir = s => location.replace(s.rol === 'dueño' ? destino : 'pos.html');
+  const yaDentro = sesionActual(); if (yaDentro) ir(yaDentro);
 
   q('#ver').onchange = e => q('#p').type = e.target.checked ? 'text' : 'password';
   q('#f').addEventListener('submit', async e => {
@@ -41,11 +44,11 @@
     q('#b').disabled = true;
     const ok = await iniciarSesion(q('#u').value, q('#p').value);
     q('#b').disabled = false;
-    if (ok) { localStorage.removeItem('cach_intentos'); location.replace(destino); return; }
+    if (ok) { localStorage.removeItem('cach_intentos'); ir(ok); return; }
     const n = Number(localStorage.getItem('cach_intentos') || 0) + 1;
     localStorage.setItem('cach_intentos', n);
     if (n >= 5) { localStorage.setItem('cach_bloqueo', Date.now() + 60000); localStorage.setItem('cach_intentos', 0); }
-    err.textContent = 'Usuario o contraseña incorrectos.'; err.classList.add('on');
+    err.textContent = 'Correo/usuario o contraseña incorrectos. Si acabas de solicitar tu cuenta, espera la aprobación.'; err.classList.add('on');
     q('#p').value = ''; q('#p').focus();
   });
 </script>
