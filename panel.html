@@ -34,6 +34,7 @@
     <nav class="tabs">
       <button data-v="resumen" class="on">Resumen</button>
       <button data-v="catalogo">Catálogo de la semana</button>
+      <button data-v="noticias">Noticias</button>
       <button data-v="instagram">Instagram</button>
       <a href="admin.html">Administración</a>
       <a href="pos.html">Caja (POS)</a>
@@ -91,15 +92,19 @@
     <!-- CATÁLOGO -->
     <section class="vista" id="catalogo">
       <h2>Catálogo de la semana</h2>
-      <p class="sub">Marca qué productos se pueden pedir esta semana, cuáles salen en la portada y ajusta precios.</p>
+      <p class="sub">Marca qué productos se pueden pedir, cuáles salen en la portada, precios y sabores.</p>
       <div class="aviso">
-        <b>Cómo publicar los cambios:</b> edita y pulsa <b>Publicar en el sitio</b>: los clientes ven el catálogo nuevo en 1 a 5 minutos.
+        <b>Cómo publicar:</b> edita y pulsa <b>Publicar en el sitio</b>: los clientes ven el catálogo nuevo en 1 a 5 minutos y las cajas usan los precios nuevos.
         Si este equipo no está conectado a GitHub (Administración → Conexión y avisos), usa <b>Descargar catalogo.js</b> y súbelo a GitHub en <code>assets/js/</code>.
       </div>
       <div class="caja">
-        <label class="campo">Título del catálogo<input id="tSemana"></label>
+        <label class="campo">Título del menú<input id="tSemana"></label>
+        <h3 style="margin-top:14px">Días para recoger pedidos</h3>
+        <div id="diasLista"></div>
+        <button class="b b-sec" id="diaAgregar" style="margin-bottom:16px">+ Añadir día</button>
+        <h3>Productos</h3>
         <div class="tabla"><table>
-          <thead><tr><th title="Disponible esta semana">Disp.</th><th title="Sale en la portada">Portada</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Descripción</th><th>Foto (ruta)</th><th></th></tr></thead>
+          <thead><tr><th title="Disponible esta semana">Disp.</th><th title="Sale en la portada">Portada</th><th>Producto</th><th>Categoría</th><th>Precio</th><th title="Separados por coma">Sabores / opciones</th><th>Descripción</th><th>Foto (ruta)</th><th></th></tr></thead>
           <tbody id="filas"></tbody>
         </table></div>
         <div class="fila" style="margin-top:14px">
@@ -112,6 +117,21 @@
         </div>
         <p class="sub" id="estado" style="margin:10px 0 0;font-size:13px"></p>
       </div>
+    </section>
+
+    <!-- NOTICIAS -->
+    <section class="vista" id="noticias">
+      <h2>Noticias y eventos</h2>
+      <p class="sub">Las noticias salen en la portada (las 3 más recientes) y en la página Noticias. Los eventos salen en “¿Dónde encontrarnos?”.</p>
+      <div class="caja">
+        <div class="fila" style="justify-content:space-between"><h3 style="margin:0">Noticias y novedades</h3><button class="b b-sec" id="notAgregar">+ Nueva noticia</button></div>
+        <div id="notLista" style="margin-top:12px"></div>
+      </div>
+      <div class="caja">
+        <div class="fila" style="justify-content:space-between"><h3 style="margin:0">Eventos · ¿Dónde encontrarnos?</h3><button class="b b-sec" id="evAgregar">+ Nuevo evento</button></div>
+        <div id="evLista" style="margin-top:12px"></div>
+      </div>
+      <div class="fila"><span style="flex:1"></span><button class="b b-pri" id="notGuardar">Guardar</button><button class="b b-sec" id="notBajar">Descargar catalogo.js</button><button class="b b-rosa" id="notPublicar">Publicar en el sitio</button></div>
     </section>
 
   </div>
@@ -146,76 +166,126 @@
       : '<p class="vacio">Aún no hay ventas registradas en la caja.</p>';
   }
 
-  /* ---------- Catálogo ---------- */
-  if (JSON.stringify(store.get('catalogo_borrador', null)) === JSON.stringify(window.CACHANILLA.productos)) store.del('catalogo_borrador');
+  /* ---------- Catálogo, días, noticias y eventos (todo vive en catalogo.js) ---------- */
+  const C0 = window.CACHANILLA;
+  const copia = o => JSON.parse(JSON.stringify(o));
+  if (JSON.stringify(store.get('catalogo_borrador', null)) === JSON.stringify(C0.productos)) store.del('catalogo_borrador');
   let lista = catalogoActivo();
-  let semana = store.get('catalogo_semana', window.CACHANILLA.semana);
+  let semana = store.get('catalogo_semana', C0.semana);
+  let dias = store.get('dias_borrador', null) || copia(C0.diasPedido || []);
+  let noticias = store.get('noticias_borrador', null) || copia(C0.noticias || []);
+  let eventos = store.get('negocio_borrador', {}).eventos || copia(C0.negocio.eventos || []);
   const hayBorrador = () => !!store.get('catalogo_borrador', null);
+  const campo = (k, v, extra = '') => `<input type="text" data-k="${k}" value="${esc(v || '')}" ${extra}>`;
+
   function pintarCatalogo() {
     $('#tSemana').value = semana;
+    $('#diasLista').innerHTML = dias.map((d, i) => `<div class="fila" data-dia="${i}" style="margin-bottom:8px">
+        <input type="date" data-k="fecha" value="${esc(d.fecha)}" style="padding:8px;border:1.5px solid var(--linea);border-radius:8px">
+        <input type="text" data-k="etiqueta" value="${esc(d.etiqueta)}" placeholder="Ej. Sábado 21 · Mercado de Condado" style="flex:1;min-width:200px;padding:8px;border:1.5px solid var(--linea);border-radius:8px">
+        <button class="b b-rojo" style="padding:6px 10px" data-qdia="${i}">✕</button></div>`).join('') || '<p class="sub">Sin días: el cliente escoge cualquier fecha.</p>';
     $('#filas').innerHTML = lista.map((p, i) => `
       <tr data-i="${i}">
         <td><input type="checkbox" data-k="disponible" ${p.disponible ? 'checked' : ''}></td>
         <td><input type="checkbox" data-k="destacado" ${p.destacado ? 'checked' : ''}></td>
-        <td><input type="text" data-k="nombre" value="${esc(p.nombre)}"></td>
-        <td><input type="text" data-k="cat" value="${esc(p.cat)}" list="cats" style="min-width:100px"></td>
+        <td>${campo('nombre', p.nombre)}</td>
+        <td>${campo('cat', p.cat, 'list="cats" style="min-width:100px"')}</td>
         <td><input type="number" class="precio" step="0.05" min="0" data-k="precio" value="${p.precio}"></td>
+        <td>${campo('opciones', (p.opciones || []).join(', '), 'placeholder="Ej. Chocolate, Vainilla" style="min-width:160px"')}</td>
         <td><textarea rows="2" data-k="desc">${esc(p.desc || '')}</textarea></td>
-        <td><input type="text" data-k="img" value="${esc(p.img || '')}" style="min-width:170px"></td>
+        <td>${campo('img', p.img, 'style="min-width:170px"')}</td>
         <td><button class="b b-rojo" style="padding:6px 10px" data-borrar="${i}" title="Quitar">✕</button></td>
       </tr>`).join('') + `<datalist id="cats">${[...new Set(lista.map(p => p.cat))].map(c => `<option value="${esc(c)}">`).join('')}</datalist>`;
     const n = lista.filter(p => p.disponible).length;
-    $('#estado').textContent = `${n} de ${lista.length} productos disponibles esta semana · ` + (hayBorrador() ? 'Tienes cambios guardados en este equipo (aún no publicados si no subiste el archivo).' : 'Mostrando el catálogo publicado.');
+    $('#estado').textContent = `${n} de ${lista.length} productos disponibles · ` + (hayBorrador() ? 'Hay cambios guardados en este equipo.' : 'Mostrando el catálogo publicado.');
   }
   $('#filas').addEventListener('input', e => {
     const el = e.target, tr = el.closest('tr'); if (!tr || !el.dataset.k) return;
-    const p = lista[tr.dataset.i];
-    p[el.dataset.k] = el.type === 'checkbox' ? el.checked : el.type === 'number' ? r2(Number(el.value) || 0) : el.value;
+    const p = lista[tr.dataset.i], k = el.dataset.k;
+    if (k === 'opciones') { const o = el.value.split(',').map(x => x.trim()).filter(Boolean); if (o.length) p.opciones = o; else delete p.opciones; return; }
+    p[k] = el.type === 'checkbox' ? el.checked : el.type === 'number' ? r2(Number(el.value) || 0) : el.value;
   });
   $('#filas').addEventListener('click', e => {
     const b = e.target.closest('[data-borrar]'); if (!b) return;
-    if (confirm('¿Quitar "' + lista[b.dataset.borrar].nombre + '" del catálogo?')) { lista.splice(b.dataset.borrar, 1); pintarCatalogo(); }
+    if (confirm('¿Quitar "' + lista[b.dataset.borrar].nombre + '" del catálogo? (Para esconderlo solo esta semana, quita la marca de Disp.)')) { lista.splice(b.dataset.borrar, 1); pintarCatalogo(); }
   });
+  $('#diasLista').addEventListener('input', e => { const r = e.target.closest('[data-dia]'); if (r && e.target.dataset.k) dias[r.dataset.dia][e.target.dataset.k] = e.target.value; });
+  $('#diasLista').addEventListener('click', e => { const q = e.target.closest('[data-qdia]'); if (q) { dias.splice(q.dataset.qdia, 1); pintarCatalogo(); } });
+  $('#diaAgregar').onclick = () => { dias.push({ fecha: '', etiqueta: '' }); pintarCatalogo(); };
   $('#tSemana').oninput = e => semana = e.target.value;
   $('#agregar').onclick = () => {
     lista.push({ id: 'n' + Date.now().toString(36), nombre: 'Producto nuevo', precio: 0, cat: 'Pan dulce', disponible: true, destacado: false, img: 'assets/img/productos/nuevo.jpg', desc: '' });
     pintarCatalogo(); const f = $$('#filas tr'); f[f.length - 1].querySelector('[data-k=nombre]').select();
   };
+
+  /* Noticias y eventos */
+  function pintarNoticias() {
+    const ins = 'style="width:100%;padding:8px;border:1.5px solid var(--linea);border-radius:8px"';
+    $('#notLista').innerHTML = noticias.map((n, i) => `<div class="caja" data-not="${i}" style="background:#fff;border:1.5px solid var(--linea);box-shadow:none">
+        <div class="fila"><input type="date" data-k="fecha" value="${esc(n.fecha)}" style="padding:8px;border:1.5px solid var(--linea);border-radius:8px"><input data-k="titulo" value="${esc(n.titulo)}" placeholder="Título" style="flex:1;min-width:200px;padding:8px;border:1.5px solid var(--linea);border-radius:8px;font-weight:700"><button class="b b-rojo" style="padding:6px 10px" data-qnot="${i}">✕</button></div>
+        <textarea data-k="texto" rows="3" placeholder="Texto de la noticia" ${ins.replace('style="', 'style="margin-top:8px;')}>${esc(n.texto)}</textarea>
+        <div class="fila" style="margin-top:8px"><input data-k="img" value="${esc(n.img || '')}" placeholder="Foto (opcional) ej. assets/img/galeria/1.jpg" style="flex:2;min-width:180px;padding:8px;border:1.5px solid var(--linea);border-radius:8px"><input data-k="enlace" value="${esc(n.enlace || '')}" placeholder="Enlace (opcional) ej. pedidos.html" style="flex:1;min-width:140px;padding:8px;border:1.5px solid var(--linea);border-radius:8px"><input data-k="boton" value="${esc(n.boton || '')}" placeholder="Texto del botón" style="flex:1;min-width:120px;padding:8px;border:1.5px solid var(--linea);border-radius:8px"></div>
+      </div>`).join('') || '<p class="sub">No hay noticias.</p>';
+    $('#evLista').innerHTML = eventos.map((ev, i) => `<div class="fila" data-ev="${i}" style="margin-bottom:8px">
+        <input data-k="fecha" value="${esc(ev.fecha)}" placeholder="Sáb 21 nov" style="width:130px;padding:8px;border:1.5px solid var(--linea);border-radius:8px">
+        <input data-k="lugar" value="${esc(ev.lugar)}" placeholder="Lugar" style="flex:2;min-width:180px;padding:8px;border:1.5px solid var(--linea);border-radius:8px">
+        <input data-k="nota" value="${esc(ev.nota || '')}" placeholder="Nota (horario, dirección)" style="flex:2;min-width:160px;padding:8px;border:1.5px solid var(--linea);border-radius:8px">
+        <button class="b b-rojo" style="padding:6px 10px" data-qev="${i}">✕</button></div>`).join('') || '<p class="sub">No hay eventos.</p>';
+  }
+  $('#notLista').addEventListener('input', e => { const r = e.target.closest('[data-not]'); if (r && e.target.dataset.k) noticias[r.dataset.not][e.target.dataset.k] = e.target.value; });
+  $('#evLista').addEventListener('input', e => { const r = e.target.closest('[data-ev]'); if (r && e.target.dataset.k) eventos[r.dataset.ev][e.target.dataset.k] = e.target.value; });
+  $('#notLista').addEventListener('click', e => { const q = e.target.closest('[data-qnot]'); if (q && confirm('¿Borrar esta noticia?')) { noticias.splice(q.dataset.qnot, 1); pintarNoticias(); } });
+  $('#evLista').addEventListener('click', e => { const q = e.target.closest('[data-qev]'); if (q) { eventos.splice(q.dataset.qev, 1); pintarNoticias(); } });
+  $('#notAgregar').onclick = () => { noticias.unshift({ fecha: new Date().toISOString().slice(0, 10), titulo: '', texto: '', img: '', enlace: '', boton: '' }); pintarNoticias(); $('#notLista [data-k=titulo]').focus(); };
+  $('#evAgregar').onclick = () => { eventos.push({ fecha: '', lugar: '', nota: '' }); pintarNoticias(); };
+
+  /* Guardar / publicar todo */
   function validar() {
-    const malo = lista.find(p => !p.nombre.trim() || !(p.precio > 0));
+    const malo = lista.find(p => !String(p.nombre).trim() || !(p.precio > 0));
     if (malo) { toast('Revisa nombre y precio de: ' + (malo.nombre || 'producto sin nombre'), true); return false; }
+    if (dias.some(d => !d.fecha || !d.etiqueta.trim())) { toast('Completa la fecha y el texto de cada día de recogido', true); return false; }
+    if (noticias.some(n => !n.titulo.trim() || !n.fecha)) { toast('Cada noticia necesita fecha y título', true); return false; }
     return true;
   }
-  $('#guardar').onclick = () => { if (!validar()) return; store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana); toast('Guardado en este equipo'); pintarCatalogo(); };
-  $('#descartar').onclick = () => {
-    if (!confirm('¿Descartar tus cambios y volver al catálogo publicado?')) return;
-    store.del('catalogo_borrador'); store.del('catalogo_semana');
-    lista = catalogoActivo(); semana = window.CACHANILLA.semana; pintarCatalogo(); toast('Listo');
-  };
+  function guardarBorradores() {
+    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana); store.set('dias_borrador', dias); store.set('noticias_borrador', noticias);
+    store.set('negocio_borrador', Object.assign(store.get('negocio_borrador', {}), { eventos }));
+    marcarBaseCatalogo([store.get('catalogo_base', ''), C0.actualizado || ''].sort().pop());
+  }
+  function versionNueva() { const d = new Date(), z = n => String(n).padStart(2, '0'); return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}T${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`; }
   function textoCatalogo() {
-    const datos = Object.assign({}, window.CACHANILLA, { semana, productos: lista, negocio: Object.assign({}, window.CACHANILLA.negocio, store.get('negocio_borrador', {})) });
-    return `/* =====================================================================
-   LA CACHANILLA · DATOS DEL NEGOCIO Y CATÁLOGO DE LA SEMANA
+    const v = versionNueva();
+    noticias.sort((a, b) => (b.fecha || '').localeCompare(a.fecha || ''));
+    const datos = Object.assign({}, C0, { actualizado: v, semana, diasPedido: dias, noticias, productos: lista,
+      negocio: Object.assign({}, C0.negocio, store.get('negocio_borrador', {})) });
+    return { v, texto: `/* =====================================================================
+   LA CACHANILLA · DATOS DEL NEGOCIO, MENÚ, NOTICIAS Y EVENTOS
    Actualizado desde el Panel de dueños el ${new Date().toLocaleString('es-PR')}${s ? ' por ' + s.nombre : ''}.
-   Para cambiarlo usa Panel → Catálogo de la semana.
+   Para cambiarlo usa el Panel (Catálogo, Noticias, Instagram).
    ===================================================================== */
 window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
-`;
+` };
   }
-  $('#bajar').onclick = () => {
+  function bajarCatalogo() { if (!validar()) return; guardarBorradores(); const t = textoCatalogo(); marcarBaseCatalogo(t.v); descargar('catalogo.js', t.texto, 'text/javascript;charset=utf-8'); pintarCatalogo(); }
+  async function publicarCatalogo(boton, mensaje) {
     if (!validar()) return;
-    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana);
-    descargar('catalogo.js', textoCatalogo(), 'text/javascript;charset=utf-8');
-    pintarCatalogo();
-  };
-  $('#publicarCat').onclick = async () => {
-    if (!validar()) return;
-    if (!ghConectado()) { toast('Este equipo no está conectado a GitHub. Conéctalo en Administración → Conexión y avisos', true); return; }
-    store.set('catalogo_borrador', lista); store.set('catalogo_semana', semana);
-    const b = $('#publicarCat'); b.disabled = true; b.textContent = 'Publicando…';
-    try { await ghPublicar('assets/js/catalogo.js', textoCatalogo(), 'Actualizar catálogo de la semana'); toast('Publicado. Los clientes lo ven en 1 a 5 minutos'); }
+    guardarBorradores();
+    if (!ghConectado()) { toast('Guardado en este equipo. Para publicar, conecta GitHub en Administración o usa Descargar', true); return; }
+    const txt = boton.textContent; boton.disabled = true; boton.textContent = 'Publicando…';
+    try { const t = textoCatalogo(); await ghPublicar('assets/js/catalogo.js', t.texto, mensaje); marcarBaseCatalogo(t.v); toast('Publicado. Se ve en el sitio en 1 a 5 minutos'); }
     catch (e) { toast('No se pudo publicar: ' + e.message, true); }
-    b.disabled = false; b.textContent = 'Publicar en el sitio';
+    boton.disabled = false; boton.textContent = txt; pintarCatalogo();
+  }
+  $('#guardar').onclick = $('#notGuardar').onclick = () => { if (!validar()) return; guardarBorradores(); toast('Guardado en este equipo'); pintarCatalogo(); };
+  $('#bajar').onclick = $('#notBajar').onclick = bajarCatalogo;
+  $('#publicarCat').onclick = () => publicarCatalogo($('#publicarCat'), 'Actualizar menú de la semana');
+  $('#notPublicar').onclick = () => publicarCatalogo($('#notPublicar'), 'Actualizar noticias y eventos');
+  $('#descartar').onclick = () => {
+    if (!confirm('¿Descartar tus cambios (menú, días, noticias y eventos) y volver a lo publicado?')) return;
+    ['catalogo_borrador', 'catalogo_semana', 'dias_borrador', 'noticias_borrador'].forEach(k => store.del(k));
+    const nb = store.get('negocio_borrador', {}); delete nb.eventos; store.set('negocio_borrador', nb);
+    lista = catalogoActivo(); semana = C0.semana; dias = copia(C0.diasPedido || []); noticias = copia(C0.noticias || []); eventos = copia(C0.negocio.eventos || []);
+    pintarCatalogo(); toast('Listo');
   };
 
 
@@ -248,15 +318,8 @@ window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
       $('#igRes').innerHTML = '<b style="color:var(--rojo)">No se pudo leer el feed.</b> Revisa la URL y que el dominio esté en la whitelist (en este equipo puede fallar si no estás en el sitio publicado).';
     }
   };
-  $('#igBajar').onclick = () => { const n = leerIG(); if (!n) return; store.set('negocio_borrador', n); descargar('catalogo.js', textoCatalogo(), 'text/javascript;charset=utf-8'); };
-  $('#igPublicar').onclick = async () => {
-    const n = leerIG(); if (!n) return; store.set('negocio_borrador', n);
-    if (!ghConectado()) { toast('Guardado en este equipo. Para publicar, conecta GitHub en Administración o usa Descargar', true); return; }
-    const b = $('#igPublicar'); b.disabled = true; b.textContent = 'Publicando…';
-    try { await ghPublicar('assets/js/catalogo.js', textoCatalogo(), 'Actualizar Instagram de la página'); toast('Publicado. Se ve en la portada en 1 a 5 minutos'); }
-    catch (e) { toast('No se pudo publicar: ' + e.message, true); }
-    b.disabled = false; b.textContent = 'Guardar y publicar';
-  };
+  $('#igBajar').onclick = () => { const n = leerIG(); if (!n) return; store.set('negocio_borrador', Object.assign(store.get('negocio_borrador', {}), n)); bajarCatalogo(); };
+  $('#igPublicar').onclick = () => { const n = leerIG(); if (!n) return; store.set('negocio_borrador', Object.assign(store.get('negocio_borrador', {}), n)); publicarCatalogo($('#igPublicar'), 'Actualizar Instagram de la página'); };
 
   /* ---------- Navegación ---------- */
   function ir(v) {
@@ -265,6 +328,7 @@ window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
     if (v === 'resumen') pintarResumen();
     if (v === 'catalogo') pintarCatalogo();
     if (v === 'instagram') pintarIG();
+    if (v === 'noticias') pintarNoticias();
     scrollTo(0, 0);
   }
   $$('.tabs button[data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));

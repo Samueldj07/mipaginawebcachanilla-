@@ -9,6 +9,7 @@ Sitio web de La Cachanilla con diseño inspirado en la talavera poblana, página
 | Inicio | `index.html` | Clientes |
 | Menú | `menu.html` | Clientes |
 | Haz tu pedido (catálogo de la semana) | `pedidos.html` | Clientes — el pedido llega por WhatsApp |
+| Noticias y eventos | `noticias.html` | Clientes |
 | Nosotros + galería | `nosotros.html` | Clientes |
 | Videos de Instagram | `instagram.html` | Clientes |
 | Acceso | `acceso.html` | Equipo (correo o usuario + contraseña) |
@@ -40,6 +41,12 @@ Solo los **Administradores/as** (dueños) entran. Cualquiera de ellos puede auto
 - **Publicación automática:** si el equipo del administrador está conectado a GitHub (Administración → *Conexión y avisos*, con un token que solo puede escribir en este repositorio), al aprobar la cuenta queda activa en 1–5 minutos sin subir archivos. Lo mismo para *Publicar en el sitio* del catálogo.
 - Sin conexión: descarga `cuentas.js` y súbelo a GitHub en `assets/js/`.
 - Accesos: **Administrador/a** (panel, administración y caja) y **Cajero/a** (solo caja). Las contraseñas no se guardan, solo una huella (hash).
+
+## Menú, días de recogido y noticias
+Todo se edita en el **Panel** y se publica con *Publicar en el sitio*:
+- **Catálogo de la semana:** productos, precios, sabores (separados por coma), qué está disponible y qué sale en portada, y los **días para recoger pedidos**.
+- **Noticias:** noticias y novedades (las 3 más recientes salen en la portada) y los eventos de “¿Dónde encontrarnos?”.
+La caja (POS) muestra solo el menú de la semana y pide el sabor cuando el producto lo tiene.
 
 ## Instagram en la portada
 Las últimas publicaciones salen solas en la portada y en Videos usando **Behold** (behold.so, plan gratis: 6 publicaciones, se actualiza 1 vez al día, 1,200 vistas/mes).

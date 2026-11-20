@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noticias · La Cachanilla Panadería Mexicana</title>
+<meta name="description" content="Noticias, novedades y próximos eventos de La Cachanilla, panadería mexicana en Puerto Rico.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/marca/icono-32.png">
+<link rel="apple-touch-icon" href="assets/img/marca/icono-180.png">
+<meta property="og:title" content="Noticias · La Cachanilla Panadería Mexicana">
+<meta property="og:description" content="Noticias, novedades y próximos eventos de La Cachanilla, panadería mexicana en Puerto Rico.">
+<meta property="og:site_name" content="La Cachanilla">
+<meta property="og:image" content="assets/img/marca/compartir.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#006b50">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/styles.css">
+<script>window.phFoto=function(i){(window._phq=window._phq||[]).push(i)}</script>
+</head>
+<body data-page="noticias">
+<div id="site-header"></div>
+<main>
+  <div class="cabeza"><h1>Noticias</h1><p>Novedades, menú de la semana y dónde encontrarnos.</p></div>
+  <section>
+    <div class="wrap">
+      <div class="lista-noticias" id="lista"></div>
+    </div>
+  </section>
+  <section class="bg-rosa">
+    <div class="wrap">
+      <div class="titulo rev"><div class="cenefa"></div><h2>Próximos eventos</h2></div>
+      <div class="eventos" id="eventos"></div>
+      <p style="text-align:center;margin-top:30px"><a class="btn btn-rosa" href="pedidos.html">Hacer mi pedido</a></p>
+    </div>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/site.js"></script>
+<script>
+  $('#lista').innerHTML = tarjetasNoticias() || '<p class="nota" style="text-align:center">Pronto tendremos novedades. ¡Síguenos en Instagram!</p>';
+  $('#eventos').innerHTML = window.CACHANILLA.negocio.eventos.map(e => `
+    <div class="evento rev"><div class="f">${esc(e.fecha)}</div><div><b>${esc(e.lugar)}</b><small>${esc(e.nota || '')}</small></div></div>`).join('');
+  revelar();
+</script>
+</body>
+</html>

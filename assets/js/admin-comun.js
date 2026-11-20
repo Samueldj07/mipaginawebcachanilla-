@@ -14,8 +14,15 @@ const store = {
 /* Catálogo activo: el borrador del panel (si existe) o el del archivo publicado */
 function catalogoActivo() {
   const b = store.get('catalogo_borrador', null);
+  // Si se publicó un catálogo más nuevo desde otro equipo, el borrador viejo se descarta
+  if ((window.CACHANILLA.actualizado || '') > store.get('catalogo_base', '')) {
+    store.del('catalogo_borrador'); store.del('catalogo_semana'); store.del('negocio_borrador'); store.del('noticias_borrador'); store.del('dias_borrador');
+    return JSON.parse(JSON.stringify(window.CACHANILLA.productos));
+  }
   return Array.isArray(b) && b.length ? b : JSON.parse(JSON.stringify(window.CACHANILLA.productos));
 }
+/* Marca los borradores como basados en el catálogo publicado actual */
+function marcarBaseCatalogo(v) { store.set('catalogo_base', v || window.CACHANILLA.actualizado || ''); }
 
 const AJUSTES_BASE = {
   estatal: 6.0, municipal: 1.0, incluido: false,

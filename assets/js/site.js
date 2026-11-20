@@ -28,6 +28,7 @@
   const links = [
     ['index.html', 'Inicio', 'inicio'],
     ['menu.html', 'Menú', 'menu'],
+    ['noticias.html', 'Noticias', 'noticias'],
     ['nosotros.html', 'Nosotros', 'nosotros'],
     ['instagram.html', 'Videos', 'instagram'],
     ['pedidos.html', 'Haz tu pedido', 'pedidos', 'cta'],
@@ -66,6 +67,7 @@
             <ul>
               <li><a href="menu.html">Menú</a></li>
               <li><a href="pedidos.html">Pedidos</a></li>
+              <li><a href="noticias.html">Noticias</a></li>
               <li><a href="nosotros.html">Nosotros</a></li>
               <li><a href="instagram.html">Videos</a></li>
             </ul>
@@ -86,6 +88,19 @@
       </div>
     </footer>`;
   }
+
+  /* Noticias y novedades */
+  window.fechaLarga = f => { try { return new Date(f + 'T12:00').toLocaleDateString('es-PR', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return f; } };
+  window.tarjetasNoticias = max => (D.noticias || []).slice().sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '')).slice(0, max || 99).map(n => `
+    <article class="noticia rev">
+      ${n.img ? `<div class="n-img"><img src="${esc(n.img)}" alt="" loading="lazy" data-n="${esc(n.titulo)}" onerror="this.parentNode.remove()"></div>` : ''}
+      <div class="n-body">
+        <time datetime="${esc(n.fecha)}">${esc(fechaLarga(n.fecha))}</time>
+        <h3>${esc(n.titulo)}</h3>
+        <p>${esc(n.texto).replace(/\n/g, '<br>')}</p>
+        ${n.enlace ? `<a class="btn btn-azul" href="${esc(n.enlace)}" ${/^https?:/.test(n.enlace) ? 'target="_blank" rel="noopener"' : ''}>${esc(n.boton || 'Ver más')}</a>` : ''}
+      </div>
+    </article>`).join('');
 
   /* Animación de entrada */
   const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
