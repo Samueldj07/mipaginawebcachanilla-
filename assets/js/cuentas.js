@@ -12,7 +12,7 @@
 window.CUENTAS = {
   // Aquí llegan las solicitudes de cuenta nuevas
   whatsappDueno: "19392540736",
-  correoDueno: "",            // ⚠️ Correo principal de los dueños (para recibir solicitudes)
+  correoDueno: "spm.biokinet@gmail.com",   // Temporal: cambiar al correo de La Cachanilla cuando exista
 
   usuarios: [
     { usuario: "cachanilla", nombre: "Dueños La Cachanilla", correo: "", whatsapp: "19392540736", rol: "dueño", alta: "2026-11-19",
