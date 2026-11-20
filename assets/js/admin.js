@@ -266,6 +266,7 @@ function ir(v) {
   $$('.tabs button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   $$('.vista').forEach(x => x.classList.toggle('on', x.id === v));
   scrollTo(0, 0);
+  document.dispatchEvent(new CustomEvent('vista', { detail: v }));
 }
 $$('.tabs button[data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));
 pintarTodo();
