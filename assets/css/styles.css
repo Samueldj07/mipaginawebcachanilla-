@@ -4,7 +4,7 @@
 :root{
   --cobalto:#1d3f9a; --cobalto-o:#12286b; --cielo:#dfe7fb;
   --amarillo:#f2b705; --naranja:#e2572b; --rosa:#c2366f; --rosa-l:#fde4ee;
-  --verde:#1f4d3a; --hoja:#2f8f5b; --crema:#fbf6ec; --papel:#fffdf8;
+  --verde:#1f4d3a; --verde-marca:#006b50; --rosa-marca:#ee5876; --hoja:#2f8f5b; --crema:#fbf6ec; --papel:#fffdf8;
   --tinta:#231d19; --gris:#6f645b; --linea:#ecdcc4;
   --radio:18px; --sombra:0 10px 30px rgba(18,40,107,.12);
   --f-logo:'Lobster',cursive; --f-tit:'Fraunces',Georgia,serif; --f-txt:'Poppins',system-ui,sans-serif;
@@ -14,7 +14,7 @@ html{scroll-behavior:smooth}
 body{margin:0;font-family:var(--f-txt);color:var(--tinta);background:var(--crema);line-height:1.6;font-size:16px}
 img{max-width:100%;display:block}
 a{color:var(--cobalto)}
-h1,h2,h3{font-family:var(--f-tit);line-height:1.15;margin:0 0 .4em;color:var(--cobalto-o)}
+h1,h2,h3{font-family:var(--f-tit);line-height:1.15;margin:0 0 .4em;color:var(--verde-marca)}
 .wrap{width:min(1180px,92%);margin-inline:auto}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 
@@ -187,3 +187,16 @@ footer .copy{border-top:1px solid rgba(255,255,255,.15);margin-top:30px;padding-
 .rev{opacity:0;transform:translateY(24px);transition:opacity .6s, transform .6s}
 .rev.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){ .rev{opacity:1;transform:none} html{scroll-behavior:auto} }
+
+/* ---------- Logo de la marca ---------- */
+.logo img{height:56px;width:auto;display:block}
+@media (max-width:880px){ .logo img{height:44px} }
+.plato .foto.logo-plato{background:#fff;display:flex;align-items:center;justify-content:center;padding:9%}
+.plato .foto.logo-plato img{width:100%;height:auto;object-fit:contain}
+.logo-pie{display:inline-flex;align-items:center;justify-content:center;width:190px;height:190px;border-radius:50%;background:#fff;padding:22px;box-shadow:0 0 0 6px var(--amarillo),0 0 0 12px var(--rosa)}
+.logo-pie img{width:100%;height:auto}
+.ph img{width:38%;height:auto;opacity:.75}
+.ph b{font-size:18px}
+.logo-login{display:block;margin:-6px auto 0;width:min(240px,70%)}
+.logo-login img{width:100%;height:auto}
+.caja-login .area{text-align:center;margin:0 0 6px;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:12px;color:var(--rosa-marca)}

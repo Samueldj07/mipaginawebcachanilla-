@@ -141,3 +141,11 @@ pre{padding:12px;overflow:auto;white-space:pre-wrap;word-break:break-all}
   #reciboImp, #reciboImp *{visibility:visible}
   #reciboImp{position:absolute;left:0;top:0;width:80mm;border:0}
 }
+
+/* Logo en la barra del área privada */
+.adm-top .marca{flex-direction:column;align-items:flex-start;gap:3px}
+.adm-top .marca .pastilla{background:#fff;border-radius:10px;padding:4px 10px;display:inline-flex}
+.adm-top .marca img{height:30px;width:auto;display:block}
+.adm-top .marca small{font-family:'Poppins',sans-serif;font-size:10px;letter-spacing:1.5px;opacity:.85;text-transform:uppercase}
+.recibo .logo-recibo{width:150px;height:auto;margin:0 auto 4px;display:block}
+.recibo .pagado{top:118px}
