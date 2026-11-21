@@ -38,7 +38,7 @@ window.CACHANILLA = {
   },
 
   // Cambia cada vez que se publica desde el panel (sirve para que los equipos usen el catálogo nuevo)
-  actualizado: "2026-11-19T21:20",
+  actualizado: "2026-11-20T22:15",
 
   // Texto que aparece arriba del catálogo de pedidos
   semana: "Menú del fin de semana · 21 y 22 de noviembre",
@@ -80,6 +80,7 @@ window.CACHANILLA = {
     { id: "p13", nombre: "Pan de muerto",             precio: 3.50, cat: "Pan dulce",  disponible: true,  destacado: false, img: "assets/img/productos/pan-muerto.jpg",   desc: "Tradición mexicana con azahar y azúcar." },
     { id: "p3",  nombre: "Bisquet mantequilla",       precio: 3.50, cat: "Pan dulce",  disponible: true,  destacado: false, img: "assets/img/productos/bisquet.jpg",      desc: "Esponjoso, dorado y con mucha mantequilla." },
     { id: "p4",  nombre: "Teleras sencillas",         precio: 2.50, cat: "Pan salado", disponible: true,  destacado: false, img: "assets/img/productos/telera.jpg",       desc: "Pan salado tradicional, perfecto para tortas." },
+    { id: "e8",  nombre: "Bolillos",                  precio: 2.50, cat: "Pan salado", disponible: true,  destacado: false, img: "assets/img/productos/bolillo.jpg",      desc: "El pan blanco clásico de México: crujiente por fuera y suave por dentro." },
     { id: "p5",  nombre: "Mini telera",               precio: 2.50, cat: "Pan salado", disponible: true,  destacado: false, img: "assets/img/productos/telera-jalapeno.jpg", desc: "Mini telera rellena.", opciones: ["Queso y jalapeño", "Queso y pepperoni"] },
     { id: "d1",  nombre: "Champurrado de galleta 12 oz", precio: 5.00, cat: "Bebidas", disponible: true, destacado: false, img: "assets/img/productos/champurrado.jpg", desc: "Bebida caliente de masa y chocolate, con galleta." },
 
