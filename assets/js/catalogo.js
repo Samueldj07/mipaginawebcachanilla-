@@ -51,6 +51,10 @@ window.CACHANILLA = {
   ],
 
   // Noticias y novedades (la más reciente primero). Se editan en Panel → Noticias.
+  // Cursos de repostería mexicana (se administran en Administración → Cursos)
+  // publicado: false = borrador (no sale en la página)
+  cursos: [],
+
   noticias: [
     { fecha: "2026-11-19", titulo: "Este fin de semana: sábado y domingo",
       texto: "El sábado 21 abrimos como Panadería Mexicana en el Edificio 1109 de Santa Rita, Río Piedras (PR 00925), de 12:00 p.m. a 5:00 p.m., y el domingo 22 nos vemos en el Día de Mercado del Conservatorio de Música de Puerto Rico. ¡Aparta tu pan desde ya!",

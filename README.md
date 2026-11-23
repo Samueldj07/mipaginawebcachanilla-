@@ -10,6 +10,7 @@ Sitio web de La Cachanilla con diseño inspirado en la talavera poblana, página
 | Menú | `menu.html` | Clientes |
 | Haz tu pedido (catálogo de la semana) | `pedidos.html` | Clientes — el pedido llega por WhatsApp |
 | Noticias y eventos | `noticias.html` | Clientes |
+| Cursos de repostería | `cursos.html` | Clientes: fichas de cursos con botón de compra |
 | Nosotros + galería | `nosotros.html` | Clientes |
 | Videos de Instagram | `instagram.html` | Clientes |
 | Acceso dueños y equipo | `acceso.html` | Dueños y cajeros |
@@ -62,6 +63,11 @@ Si no hay feed, la portada muestra los reels fijados o los espacios de video.
 - Documentos imprimibles / PDF con el logo.
 - **Privacidad:** estos datos NO se publican en el sitio. Se guardan en el equipo y, si se conecta, en un repositorio **privado** (`cachanilla-datos`) para compartirlos entre administradores.
 - No sustituye la facturación fiscal oficial de Hacienda (SURI); confirma con tu contador.
+
+## Cursos (Administración → Cursos)
+- Fichas de cursos: título, descripción, qué incluye, precio, nivel, duración, modalidad, foto o video de muestra (YouTube/Instagram) y **enlace de compra** de la plataforma (Hotmart, Teachable, Payhip, Stripe…).
+- Sin enlace de compra, el curso muestra “Avísame cuando salga” (WhatsApp).
+- El contenido pagado (videos, PDF) **no** se sube al sitio: es público. Va en la plataforma que cobra y protege el acceso.
 
 ## Fotos y video (espacios listos)
 Sube las fotos con estos nombres y aparecen solas:
