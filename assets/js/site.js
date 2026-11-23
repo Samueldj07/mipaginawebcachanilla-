@@ -29,6 +29,7 @@
     ['index.html', 'Inicio', 'inicio'],
     ['menu.html', 'Menú', 'menu'],
     ['noticias.html', 'Noticias', 'noticias'],
+    ['cursos.html', 'Cursos', 'cursos'],
     ['nosotros.html', 'Nosotros', 'nosotros'],
     ['instagram.html', 'Videos', 'instagram'],
     ['pedidos.html', 'Haz tu pedido', 'pedidos', 'cta'],
@@ -68,6 +69,7 @@
               <li><a href="menu.html">Menú</a></li>
               <li><a href="pedidos.html">Pedidos</a></li>
               <li><a href="noticias.html">Noticias</a></li>
+              <li><a href="cursos.html">Cursos</a></li>
               <li><a href="nosotros.html">Nosotros</a></li>
               <li><a href="instagram.html">Videos</a></li>
             </ul>
