@@ -7,7 +7,7 @@ window.CACHANILLA = {
   "negocio": {
     "nombre": "La Cachanilla",
     "lema": "Panadería mexicana · hecha a mano en Puerto Rico",
-    "whatsapp": "19392540736",
+    "whatsapp": "19393510339",
     "instagram": "lacachanilla.mxdulce",
     "instagramFeed": "",
     "correo": "",
@@ -27,7 +27,7 @@ window.CACHANILLA = {
       }
     ]
   },
-  "actualizado": "2026-11-24T16:10:00",
+  "actualizado": "2026-11-25T09:10:00",
   "semana": "Menú del sábado 28 de noviembre",
   "pedidosNota": "Aparta tu pan para el sábado 28 de noviembre. Te confirmamos por WhatsApp. Los tamales y el pan de muerto son de cantidad limitada.",
   "diasPedido": [

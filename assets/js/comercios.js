@@ -20,7 +20,7 @@
     clientes: [], pedidos: [], seq: { F: 0, R: 0 },
     factura: {
       nombre: 'La Cachanilla Repostería Mexicana', dir: 'Edificio 1109, Santa Rita, Río Piedras, PR 00925',
-      tel: '939-254-0736', correo: 'lacachanillamx@outlook.com', registro: '', ivu: 11.5,
+      tel: '939-351-0339', correo: 'lacachanillamx@outlook.com', registro: '', ivu: 11.5,
       pago: 'ATH Móvil 939-254-0736, efectivo o transferencia', pie: '¡Gracias por su preferencia! Un antojo mexicano, donde quiera que vayamos.'
     }
   };
