@@ -1,3 +1,4 @@
+const METODOS_POS = ['Efectivo', 'ATH Móvil', 'Tarjeta', 'PayPal', 'Venmo'];
 /* La Cachanilla · Caja (POS) */
 let productos = catalogoActivo();
 let cfg = ajustes();
@@ -98,7 +99,7 @@ function pintarPago() {
     <h3>Cobrar</h3>
     <div class="sub" style="margin:0">${c.art} artículos · Subtotal ${money(c.subtotal)} · IVU ${money(c.ivu)}</div>
     <div class="debe">${money(c.total)}</div>
-    <div class="metodos">${['Efectivo', 'ATH Móvil', 'Tarjeta'].map(m => `<button data-m="${m}" class="${pago.metodo === m ? 'on' : ''}">${m}</button>`).join('')}</div>
+    <div class="metodos">${METODOS_POS.map(m => `<button data-m="${m}" class="${pago.metodo === m ? 'on' : ''}">${m}</button>`).join('')}</div>
     ${efectivo ? `
       <label class="campo">Cliente entrega<input type="number" inputmode="decimal" step="0.01" id="recibido" placeholder="0.00" value="${esc(pago.recibido)}"></label>
       <div class="billetes">${rapidos.map(v => `<button data-bill="${v}">${v === c.total && v % 1 ? 'Exacto' : '$' + v}</button>`).join('')}</div>
@@ -214,7 +215,7 @@ function pintarCierre() {
       <div class="kpi"><span>IVU cobrado</span><b>${money(r.ivu)}</b></div>
     </div>
     <div class="caja"><h3>Por método de pago</h3>
-      ${['Efectivo', 'ATH Móvil', 'Tarjeta'].map(m => `<div class="fila" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--linea)"><span>${m}</span><b>${money(r.metodos[m] || 0)}</b></div>`).join('')}
+      ${METODOS_POS.map(m => `<div class="fila" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--linea)"><span>${m}</span><b>${money(r.metodos[m] || 0)}</b></div>`).join('')}
       <div class="fila" style="justify-content:space-between;padding:6px 0"><span>Subtotal (sin IVU)</span><b>${money(r.subtotal)}</b></div>
       ${anuladas ? `<p class="sub" style="margin:6px 0 0">${anuladas} venta(s) anulada(s) no incluidas.</p>` : ''}
     </div>
@@ -231,7 +232,7 @@ function textoCierre() {
     `Ventas: ${r.n} · Artículos: ${r.art}`,
     `Subtotal: ${money(r.subtotal)} · IVU: ${money(r.ivu)}`,
     `TOTAL: ${money(r.total)}`, '',
-    ...['Efectivo', 'ATH Móvil', 'Tarjeta'].map(m => `${m}: ${money(r.metodos[m] || 0)}`), '',
+    ...METODOS_POS.map(m => `${m}: ${money(r.metodos[m] || 0)}`), '',
     ...Object.entries(r.productos).sort((a, b) => b[1].q - a[1].q).map(([n, p]) => `${p.q} × ${n} = ${money(p.total)}`)
   ].join('\n');
 }

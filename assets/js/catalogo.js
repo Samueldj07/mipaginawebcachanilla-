@@ -35,9 +35,18 @@ window.CACHANILLA = {
       "waze": "https://waze.com/ul?q=1109%20Calle%20C%C3%A9sar%20Gonz%C3%A1lez%2C%20San%20Juan%2C%20PR%2000925&navigate=yes",
       "embed": "https://maps.google.com/maps?q=1109%20Calle%20C%C3%A9sar%20Gonz%C3%A1lez%2C%20San%20Juan%2C%20PR%2000925&z=17&output=embed",
       "referencia": ""
+    },
+    "pagos": {
+      "athmovil": "939-254-0736",
+      "paypal": "",
+      "venmo": "",
+      "stripe": "",
+      "tarjetaEnPersona": true,
+      "efectivo": true,
+      "ivu": 11.5
     }
   },
-  "actualizado": "2026-11-26T15:50:00",
+  "actualizado": "2026-11-26T16:20:00",
   "semana": "Menú del sábado 28 de noviembre",
   "pedidosNota": "Aparta tu pan para el sábado 28 de noviembre. Te confirmamos por WhatsApp. Los tamales y el pan de muerto son de cantidad limitada.",
   "diasPedido": [

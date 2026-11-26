@@ -282,3 +282,14 @@ svg.pin{width:18px;height:18px;fill:currentColor;flex:none}
 .dir-pie a{line-height:1.45}
 #dirRecogido{margin-top:8px}
 @media (max-width:760px){.ubicacion{grid-template-columns:1fr}.ubicacion address{font-size:18px}.barra-dir{font-size:13.5px}}
+
+/* Formas de pago */
+.tot-ivu{font-size:14px;opacity:.85}
+.pagar-ahora{margin-top:18px;padding:16px;border-radius:14px;background:#fff7f9;border:2px dashed var(--rosa-marca,#ee5876)}
+.pagar-ahora h4{margin:0 0 4px}
+#botonesPago{display:grid;gap:8px;margin-top:10px}
+.pago-btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:0;cursor:pointer;font:inherit;text-decoration:none;color:#fff}
+.pago-btn span{font-size:13px;opacity:.92}
+.pago-btn.ath{background:#f26b21}.pago-btn.stripe{background:#635bff}.pago-btn.paypal{background:#003087}.pago-btn.venmo{background:#008cff}
+.pagos-pie{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:18px 0 0;font-size:14px}
+.pagos-pie span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);padding:3px 10px;border-radius:999px}

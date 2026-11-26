@@ -38,6 +38,27 @@
   const U = N.ubicacion || {};
   const PIN = '<svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
   window.textoDireccion = () => [U.nombre, U.direccion, U.ciudad].filter(Boolean).join(', ');
+
+  /* Formas de pago (se configuran en Panel → Pagos) */
+  const PG = N.pagos || {};
+  const usuarioDe = v => String(v || '').trim().replace(/^@/, '').replace(/^https?:\/\/(www\.)?(paypal\.me|venmo\.com)\/(u\/)?/i, '').replace(/\/.*$/, '');
+  window.metodosPago = total => {
+    const t = total ? (Math.round(total * 100) / 100).toFixed(2) : '';
+    const m = [];
+    if (PG.athmovil) m.push({ id: 'ATH Móvil', clase: 'ath', titulo: 'ATH Móvil', det: `Envía a <b>${esc(PG.athmovil)}</b>`, copiar: PG.athmovil });
+    if (PG.stripe) m.push({ id: 'Tarjeta en línea', clase: 'stripe', titulo: 'Tarjeta de crédito o débito', det: 'Visa, Mastercard, Amex, Apple Pay y Google Pay (pago seguro con Stripe)', url: PG.stripe });
+    if (PG.paypal) { const u = /^https?:/.test(PG.paypal) && !/paypal\.me/i.test(PG.paypal) ? PG.paypal : `https://www.paypal.com/paypalme/${encodeURIComponent(usuarioDe(PG.paypal))}${t ? '/' + t + 'USD' : ''}`; m.push({ id: 'PayPal', clase: 'paypal', titulo: 'PayPal', det: 'Con tu cuenta PayPal o tarjeta', url: u }); }
+    if (PG.venmo) { const u = `https://venmo.com/${encodeURIComponent(usuarioDe(PG.venmo))}?txn=pay${t ? '&amount=' + t : ''}&note=${encodeURIComponent('Pedido La Cachanilla')}`; m.push({ id: 'Venmo', clase: 'venmo', titulo: 'Venmo', det: `@${esc(usuarioDe(PG.venmo))}`, url: u }); }
+    if (PG.tarjetaEnPersona) m.push({ id: 'Tarjeta al recoger', clase: 'tarjeta', titulo: 'Tarjeta al recoger', det: 'Crédito o débito en persona' });
+    if (PG.efectivo) m.push({ id: 'Efectivo', clase: 'efectivo', titulo: 'Efectivo', det: 'Al recoger' });
+    return m;
+  };
+  window.botonesPago = total => metodosPago(total).filter(x => x.url || x.copiar).map(x => x.url
+    ? `<a class="pago-btn ${x.clase}" href="${esc(x.url)}" target="_blank" rel="noopener"><b>${esc(x.titulo)}</b><span>${x.det}</span></a>`
+    : `<button type="button" class="pago-btn ${x.clase}" data-copiar="${esc(x.copiar)}"><b>${esc(x.titulo)}</b><span>${x.det} · tocar para copiar</span></button>`).join('');
+  document.addEventListener('click', e => { const b = e.target.closest('[data-copiar]'); if (!b) return;
+    const v = b.dataset.copiar; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast('Copiado: ' + v), () => toast(v)); });
+
   const head = $('#site-header');
   if (head) {
     head.outerHTML = `
@@ -87,6 +108,7 @@
             </ul>
           </div>
         </div>
+        ${metodosPago().length ? `<p class="pagos-pie"><b>Aceptamos:</b> ${metodosPago().map(x => `<span>${esc(x.titulo)}</span>`).join('')}</p>` : ''}
         <div class="copy">
           <span>© ${new Date().getFullYear()} ${esc(N.nombre)} · Hecho con cariño mexicano en Puerto Rico</span>
           <span><a href="acceso.html" style="opacity:.6">Acceso dueños</a> · <a href="acceso-admin.html" style="opacity:.6">Administradores</a></span>
