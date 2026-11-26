@@ -76,7 +76,7 @@
   $('#nota').textContent = D.pedidosNota;
 
   { const U = (window.CACHANILLA.negocio || {}).ubicacion; const el = document.getElementById('dirRecogido');
-    if (U && el) el.innerHTML = `<b>Recoges en:</b> ${esc(U.nombre)}, ${esc(U.ciudad)}${U.referencia ? ` (${esc(U.referencia)})` : ''} · <a href="${esc(U.mapa)}" target="_blank" rel="noopener">Ver mapa</a>`; }
+    if (U && el) el.innerHTML = `<b>Recoges en:</b> ${esc(U.nombre)}, ${esc(U.direccion)}, ${esc(U.ciudad)} · <a href="${esc(U.mapa)}" target="_blank" rel="noopener">Ver mapa</a>`; }
   /* Días de recogido: los que configuran los dueños (solo fechas que no han pasado) */
   const hoy = new Date(); hoy.setHours(0, 0, 0, 0);
   const dias = (D.diasPedido || []).filter(d => new Date(d.fecha + 'T23:59') >= hoy);
