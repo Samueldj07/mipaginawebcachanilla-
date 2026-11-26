@@ -17,8 +17,8 @@ window.CACHANILLA = {
     "eventos": [
       {
         "fecha": "Sáb 28 nov",
-        "lugar": "La Cocina del Ángel · Urb. Santa Rita, Edificio 1109, Río Piedras",
-        "nota": "12:00 p.m. a 5:00 p.m. · San Juan, PR 00925"
+        "lugar": "Cocina del Ángel · Río Piedras",
+        "nota": "12:00 p.m. a 5:00 p.m. · Urb. Santa Rita, Edif. 1109"
       },
       {
         "fecha": "Sáb 19 dic",
@@ -27,22 +27,23 @@ window.CACHANILLA = {
       }
     ],
     "ubicacion": {
-      "nombre": "La Cocina del Ángel",
-      "direccion": "Urb. Santa Rita, Edificio 1109",
+      "nombre": "Cocina del Ángel",
+      "direccion": "Cocina del Ángel",
       "ciudad": "Río Piedras, San Juan, PR 00925",
       "horario": "Sábados de 12:00 p.m. a 5:00 p.m.",
       "mapa": "https://www.google.com/maps/search/?api=1&query=Urb.%20Santa%20Rita%20Edificio%201109%2C%20R%C3%ADo%20Piedras%2C%20San%20Juan%2C%20PR%2000925",
       "waze": "https://waze.com/ul?q=Urb.%20Santa%20Rita%20Edificio%201109%2C%20R%C3%ADo%20Piedras%2C%20San%20Juan%2C%20PR%2000925&navigate=yes",
-      "embed": "https://maps.google.com/maps?q=Urb.%20Santa%20Rita%20Edificio%201109%2C%20R%C3%ADo%20Piedras%2C%20San%20Juan%2C%20PR%2000925&z=16&output=embed"
+      "embed": "https://maps.google.com/maps?q=Urb.%20Santa%20Rita%20Edificio%201109%2C%20R%C3%ADo%20Piedras%2C%20San%20Juan%2C%20PR%2000925&z=16&output=embed",
+      "referencia": "Urb. Santa Rita, Edificio 1109"
     }
   },
-  "actualizado": "2026-11-26T15:30:00",
+  "actualizado": "2026-11-26T15:40:00",
   "semana": "Menú del sábado 28 de noviembre",
   "pedidosNota": "Aparta tu pan para el sábado 28 de noviembre. Te confirmamos por WhatsApp. Los tamales y el pan de muerto son de cantidad limitada.",
   "diasPedido": [
     {
       "fecha": "2026-11-28",
-      "etiqueta": "Sábado 28 de noviembre · 12 a 5 p.m. · La Cocina del Ángel, Urb. Santa Rita, Edificio 1109, Río Piedras"
+      "etiqueta": "Sábado 28 de noviembre · 12 a 5 p.m. · Cocina del Ángel, Río Piedras"
     }
   ],
   "cursos": [],
@@ -50,7 +51,7 @@ window.CACHANILLA = {
     {
       "fecha": "2026-11-24",
       "titulo": "¡Llegan los tamales rojos este sábado 28!",
-      "texto": "Este sábado 28 de noviembre, de 12:00 p.m. a 5:00 p.m., te esperamos en La Cocina del Ángel (Urb. Santa Rita, Edificio 1109, Río Piedras, San Juan, PR 00925) con tamales rojos de rajas con queso a $4 (cantidad limitada), panqué de plátano con nuez y chocolate, troncos de canela, empanadas de queso y guayaba y mucho más. ¡Apártalos antes de que se acaben!",
+      "texto": "Este sábado 28 de noviembre, de 12:00 p.m. a 5:00 p.m., te esperamos en la Cocina del Ángel, Río Piedras (Urb. Santa Rita, Edificio 1109) con tamales rojos de rajas con queso a $4 (cantidad limitada), panqué de plátano con nuez y chocolate, troncos de canela, empanadas de queso y guayaba y mucho más. ¡Apártalos antes de que se acaben!",
       "img": "assets/img/promo-tamales-28nov.jpg",
       "enlace": "pedidos.html",
       "boton": "Apartar mi pedido"
