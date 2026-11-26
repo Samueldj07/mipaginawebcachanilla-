@@ -261,3 +261,24 @@ footer .copy{border-top:1px solid rgba(255,255,255,.15);margin-top:30px;padding-
 .cursos-vacio h3{font-size:28px}
 
 .noticia .n-img img[src*="promo-"]{object-fit:contain;background:#12286b}
+
+/* Dirección exacta */
+.barra-dir{background:var(--verde-marca,#006b50);color:#fff;font-size:14.5px}
+.barra-dir .wrap{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;justify-content:center;padding:7px 16px;text-align:center}
+.barra-dir a{color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.barra-dir a:hover span{text-decoration:underline}
+.barra-dir .bd-hora{opacity:.85}
+svg.pin{width:18px;height:18px;fill:currentColor;flex:none}
+.ubicacion{display:grid;grid-template-columns:1fr 1.3fr;gap:28px;align-items:stretch}
+.ubic-datos{background:#fff;border-radius:18px;padding:28px;box-shadow:0 6px 24px rgba(0,0,0,.08);border-top:6px solid var(--rosa-marca,#ee5876)}
+.ubic-lugar{display:flex;align-items:center;gap:8px;font-size:24px;font-weight:700;color:var(--verde-marca,#006b50);margin:0 0 10px}
+.ubic-lugar svg.pin{width:28px;height:28px;color:var(--rosa-marca,#ee5876)}
+.ubicacion address{font-style:normal;font-size:20px;line-height:1.5;margin:0 0 12px}
+.ubic-hora{margin:0 0 18px}
+.ubic-btns{display:flex;flex-wrap:wrap;gap:10px}
+.ubic-btns .btn{padding:12px 20px;font-size:15px}
+.ubic-mapa{border-radius:18px;overflow:hidden;min-height:320px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.ubic-mapa iframe{width:100%;height:100%;min-height:320px;border:0;display:block}
+.dir-pie a{line-height:1.45}
+#dirRecogido{margin-top:8px}
+@media (max-width:760px){.ubicacion{grid-template-columns:1fr}.ubicacion address{font-size:18px}.barra-dir{font-size:13.5px}}

@@ -35,6 +35,9 @@
     ['pedidos.html', 'Haz tu pedido', 'pedidos', 'cta'],
   ];
 
+  const U = N.ubicacion || {};
+  const PIN = '<svg class="pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.2 7 13 7 13s7-7.8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>';
+  window.textoDireccion = () => [U.nombre, U.direccion, U.ciudad].filter(Boolean).join(', ');
   const head = $('#site-header');
   if (head) {
     head.outerHTML = `
@@ -47,7 +50,8 @@
           ${links.map(([h, t, k, c]) => `<li><a href="${h}" class="${pagina === k ? 'on' : ''} ${c || ''}">${t}</a></li>`).join('')}
         </ul>
       </nav>
-    </header>`;
+    </header>
+    ${U.direccion ? `<div class="barra-dir"><div class="wrap"><a href="${esc(U.mapa)}" target="_blank" rel="noopener">${PIN}<span><b>${esc(U.nombre)}</b> · ${esc(U.direccion)}, ${esc(U.ciudad)}</span></a>${U.horario ? `<span class="bd-hora">${esc(U.horario)}</span>` : ''}</div></div>` : ''}`;
     const b = $('.burger'), m = $('.menu');
     b.addEventListener('click', () => { m.classList.toggle('open'); b.setAttribute('aria-expanded', m.classList.contains('open')); });
   }
@@ -79,7 +83,7 @@
             <ul>
               <li><a href="${wa}" target="_blank" rel="noopener">WhatsApp</a></li>
               <li><a href="https://instagram.com/${esc(N.instagram)}" target="_blank" rel="noopener">@${esc(N.instagram)}</a></li>
-              <li>${esc(N.zona)}</li>
+              ${U.direccion ? `<li class="dir-pie"><a href="${esc(U.mapa)}" target="_blank" rel="noopener"><b>${esc(U.nombre)}</b><br>${esc(U.direccion)}<br>${esc(U.ciudad)}</a></li>${U.horario ? `<li>${esc(U.horario)}</li>` : ''}` : `<li>${esc(N.zona)}</li>`}
             </ul>
           </div>
         </div>
@@ -89,6 +93,27 @@
         </div>
       </div>
     </footer>`;
+  }
+
+  /* Dónde estamos: dirección exacta, mapa y cómo llegar */
+  const ubic = $('#ubicacion');
+  if (ubic && U.direccion) {
+    ubic.innerHTML = `
+      <div class="ubic-datos rev">
+        <p class="ubic-lugar">${PIN}<span>${esc(U.nombre)}</span></p>
+        <address>${esc(U.direccion)}<br>${esc(U.ciudad)}</address>
+        ${U.horario ? `<p class="ubic-hora"><b>Horario:</b> ${esc(U.horario)}</p>` : ''}
+        <div class="ubic-btns">
+          <a class="btn btn-rosa" href="${esc(U.mapa)}" target="_blank" rel="noopener">Abrir en Google Maps</a>
+          ${U.waze ? `<a class="btn btn-borde" href="${esc(U.waze)}" target="_blank" rel="noopener">Ir con Waze</a>` : ''}
+          <button class="btn btn-borde" type="button" id="copiarDir">Copiar dirección</button>
+        </div>
+      </div>
+      ${U.embed ? `<div class="ubic-mapa rev"><iframe src="${esc(U.embed)}" title="Mapa: ${esc(U.nombre)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>` : ''}`;
+    $('#copiarDir').addEventListener('click', () => {
+      const t = textoDireccion();
+      (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('Dirección copiada'), () => toast(t));
+    });
   }
 
   /* Noticias y novedades */
