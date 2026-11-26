@@ -36,6 +36,7 @@
       <button data-v="catalogo">Catálogo de la semana</button>
       <button data-v="noticias">Noticias</button>
       <button data-v="instagram">Instagram</button>
+      <button data-v="pagos">Pagos</button>
       <a href="admin.html">Administración</a>
       <a href="pos.html">Caja (POS)</a>
       <button class="salir" onclick="cerrarSesion()">Salir</button>
@@ -87,6 +88,34 @@
       </div>
       <div class="fila"><span style="flex:1"></span><button class="b b-sec" id="igBajar">Descargar catalogo.js</button><button class="b b-rosa" id="igPublicar">Guardar y publicar</button></div>
       <div id="igPrev" style="margin-top:18px"></div>
+    </section>
+
+    <!-- PAGOS -->
+    <section class="vista" id="pagos">
+      <h2>Formas de pago</h2>
+      <p class="sub">Lo que llenes aquí sale en Pedidos (con el total ya calculado), en el pie de la página y en el mensaje de WhatsApp. Deja vacío lo que no uses.</p>
+      <div class="dos">
+        <div class="caja">
+          <label class="campo">ATH Móvil · número o nombre de ATH Business<input id="pgAth" placeholder="939-000-0000"></label>
+          <label class="campo">PayPal · usuario de paypal.me o enlace<input id="pgPaypal" placeholder="lacachanilla  o  https://paypal.me/lacachanilla" autocapitalize="none"></label>
+          <label class="campo">Venmo · usuario (sin @)<input id="pgVenmo" placeholder="LaCachanilla" autocapitalize="none"></label>
+          <label class="campo">Stripe · Payment Link (tarjetas, Apple Pay, Google Pay)<input id="pgStripe" placeholder="https://buy.stripe.com/…" autocapitalize="none"></label>
+          <label class="campo"><span><input type="checkbox" id="pgTarjeta"> Aceptamos tarjeta en persona al recoger</span></label>
+          <label class="campo"><span><input type="checkbox" id="pgEfectivo"> Aceptamos efectivo</span></label>
+          <label class="campo">IVU que se suma en Pedidos (%)<input id="pgIvu" type="number" step="0.1" min="0" max="20"></label>
+        </div>
+        <div class="caja">
+          <h3>Cómo conseguir cada enlace</h3>
+          <ol style="padding-left:18px;line-height:1.7;font-size:14px;margin:0">
+            <li><b>PayPal:</b> en la app de PayPal → tu perfil → <b>PayPal.Me</b> → crea tu enlace. Pega el usuario.</li>
+            <li><b>Venmo:</b> crea un perfil de <b>Venmo Business</b> (para ventas no uses la cuenta personal). Pega el usuario.</li>
+            <li><b>Stripe:</b> en dashboard.stripe.com → <b>Payment Links</b> → <b>+ New</b> → producto “Pedido La Cachanilla” → precio <b>“Customers choose what to pay”</b>. Copia el enlace <code>https://buy.stripe.com/…</code>.</li>
+            <li><b>ATH Móvil:</b> el número que recibe pagos. Con ATH Business el cliente busca el nombre del negocio.</li>
+          </ol>
+          <div class="aviso" style="margin:12px 0 0">PayPal y Venmo salen con el total ya puesto. En Stripe y ATH Móvil el cliente escribe el monto.</div>
+        </div>
+      </div>
+      <div class="fila"><span style="flex:1"></span><button class="b b-rosa" id="pgPublicar">Guardar y publicar</button></div>
     </section>
 
     <!-- CATÁLOGO -->
@@ -321,6 +350,23 @@ window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
   $('#igBajar').onclick = () => { const n = leerIG(); if (!n) return; store.set('negocio_borrador', Object.assign(store.get('negocio_borrador', {}), n)); bajarCatalogo(); };
   $('#igPublicar').onclick = () => { const n = leerIG(); if (!n) return; store.set('negocio_borrador', Object.assign(store.get('negocio_borrador', {}), n)); publicarCatalogo($('#igPublicar'), 'Actualizar Instagram de la página'); };
 
+  /* ---------- Pagos ---------- */
+  function pintarPagos() {
+    const g = Object.assign({}, NEG.pagos || {}, store.get('negocio_borrador', {}).pagos || {});
+    $('#pgAth').value = g.athmovil || ''; $('#pgPaypal').value = g.paypal || ''; $('#pgVenmo').value = g.venmo || ''; $('#pgStripe').value = g.stripe || '';
+    $('#pgTarjeta').checked = !!g.tarjetaEnPersona; $('#pgEfectivo').checked = !!g.efectivo; $('#pgIvu').value = g.ivu ?? 11.5;
+  }
+  $('#pgPublicar').onclick = () => {
+    const stripe = $('#pgStripe').value.trim();
+    if (stripe && !/^https:\/\/(buy\.stripe\.com|checkout\.stripe\.com|donate\.stripe\.com)\//.test(stripe)) return toast('El enlace de Stripe debe empezar con https://buy.stripe.com/', true);
+    const pp = $('#pgPaypal').value.trim();
+    if (pp && /^https?:/.test(pp) && !/^https:\/\/(www\.)?(paypal\.me|paypal\.com)\//.test(pp)) return toast('El enlace de PayPal no es válido', true);
+    const pagos = { athmovil: $('#pgAth').value.trim(), paypal: pp, venmo: $('#pgVenmo').value.trim().replace(/^@/, ''), stripe,
+      tarjetaEnPersona: $('#pgTarjeta').checked, efectivo: $('#pgEfectivo').checked, ivu: Number($('#pgIvu').value || 11.5) };
+    store.set('negocio_borrador', Object.assign(store.get('negocio_borrador', {}), { pagos }));
+    publicarCatalogo($('#pgPublicar'), 'Actualizar formas de pago');
+  };
+
   /* ---------- Navegación ---------- */
   function ir(v) {
     $$('.tabs button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
@@ -328,6 +374,7 @@ window.CACHANILLA = ${JSON.stringify(datos, null, 2)};
     if (v === 'resumen') pintarResumen();
     if (v === 'catalogo') pintarCatalogo();
     if (v === 'instagram') pintarIG();
+    if (v === 'pagos') pintarPagos();
     if (v === 'noticias') pintarNoticias();
     scrollTo(0, 0);
   }

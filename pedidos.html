@@ -32,7 +32,9 @@
         <h3>Tu pedido</h3>
         <div id="lineas"><p class="nota">Aún no has elegido nada. Usa el botón <b>+</b> en cada producto.</p></div>
         <div class="tot"><span>Subtotal</span><span id="total">$0.00</span></div>
-        <p class="nota">+ IVU aplicable. Pagas al recoger (efectivo, ATH Móvil o tarjeta).</p>
+        <div class="tot tot-ivu"><span>IVU (<span id="tasaIvu"></span>%)</span><span id="ivu">$0.00</span></div>
+        <div class="tot"><span><b>Total</b></span><b id="totalIvu">$0.00</b></div>
+        <p class="nota" id="notaPagos"></p>
         <form class="form" id="form">
           <label for="nombre">Tu nombre *</label>
           <input id="nombre" required autocomplete="name">
@@ -47,11 +49,18 @@
             <option>Lo recojo ese día en el lugar indicado</option>
             <option>Pedido grande para fiesta/evento (coordinar)</option>
           </select>
+          <label for="pago">¿Cómo vas a pagar?</label>
+          <select id="pago"></select>
           <label for="notas">Notas</label>
           <textarea id="notas" rows="2" placeholder="Ej. hora aproximada en que pasas"></textarea>
           <button class="btn btn-rosa" style="width:100%;justify-content:center;margin-top:16px" id="enviar" disabled>Enviar pedido por WhatsApp</button>
           <button type="button" class="btn btn-borde" style="width:100%;justify-content:center;margin-top:8px" id="vaciar">Vaciar</button>
         </form>
+        <div class="pagar-ahora" id="pagarAhora" hidden>
+          <h4>Paga ahora (opcional)</h4>
+          <p class="nota">Tu pedido se confirma por WhatsApp. Si quieres adelantar el pago, usa uno de estos y envíanos la captura.</p>
+          <div id="botonesPago"></div>
+        </div>
       </aside>
     </div>
   </section>
@@ -120,12 +129,19 @@
     return Object.keys(pedido).map(k => { const { id, op } = partes(k), p = byId(id); return { k, p, op, q: pedido[k], nombre: p.nombre + (op ? ' (' + op + ')' : '') }; })
       .sort((a, b) => P.indexOf(a.p) - P.indexOf(b.p));
   }
+  let totalActual = 0;
+  { const ms = metodosPago();
+    $('#pago').innerHTML = '<option value="">Elige…</option>' + ms.map(m => `<option>${esc(m.id)}</option>`).join('');
+    $('#notaPagos').innerHTML = ms.length ? '<b>Aceptamos:</b> ' + ms.map(m => esc(m.titulo)).join(' · ') : ''; }
   function pintarResumen() {
     const ls = lineas(); let total = 0, n = 0;
     $('#lineas').innerHTML = ls.length ? ls.map(l => { total += l.p.precio * l.q; n += l.q;
       return `<div class="lin"><span>${l.q} × ${esc(l.nombre)}</span><b>${money(l.p.precio * l.q)}</b></div>`; }).join('')
       : '<p class="nota">Aún no has elegido nada. Usa el botón <b>+</b> en cada producto.</p>';
-    $('#total').textContent = $('#mTotal').textContent = money(total);
+    const tasa = Number((D.negocio.pagos || {}).ivu ?? 11.5), ivu = Math.round(total * tasa) / 100, conIvu = total + ivu;
+    $('#total').textContent = money(total); $('#ivu').textContent = money(ivu); $('#tasaIvu').textContent = tasa;
+    $('#totalIvu').textContent = $('#mTotal').textContent = money(conIvu);
+    totalActual = conIvu;
     $('#mCount').textContent = n + (n === 1 ? ' producto' : ' productos');
     $('#enviar').disabled = !n;
   }
@@ -156,7 +172,9 @@
     const msg = [
       `¡Hola ${D.negocio.nombre}! 🌮 Quiero hacer un pedido:`, '',
       ...txt, '',
-      `Subtotal: ${money(total)} (+ IVU)`,
+      `Subtotal: ${money(total)}`,
+      `Total con IVU: ${money(totalActual)}`,
+      `Pago: ${$('#pago').value || 'Lo decido al recoger'}`,
       `Nombre: ${$('#nombre').value.trim()}`,
       `Teléfono: ${$('#tel').value.trim()}`,
       `Recojo: ${cuando}`,
@@ -165,6 +183,8 @@
     ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
     window.open(`https://wa.me/${D.negocio.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
     toast('Abriendo WhatsApp… envía el mensaje para confirmar tu pedido');
+    const bp = botonesPago(totalActual);
+    if (bp) { $('#botonesPago').innerHTML = bp; $('#pagarAhora').hidden = false; $('#pagarAhora').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
   });
 
   pintarCatalogo(); pintarResumen();
