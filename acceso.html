@@ -35,7 +35,7 @@
   const q = s => document.querySelector(s);
   const volver = new URLSearchParams(location.search).get('volver');
   const destino = /^[\w-]+\.html(#[\w=-]*)?$/.test(volver || '') ? volver : 'panel.html';
-  const ir = s => location.replace(s.rol === 'dueño' ? destino : (s.rol === 'admin' && destino.startsWith('admin.html') ? destino : inicioDe(s.rol)));
+  const ir = s => location.replace(s.rol === 'dueño' || destino.startsWith('horas.html') ? destino : (s.rol === 'admin' && destino.startsWith('admin.html') ? destino : inicioDe(s.rol)));
   const yaDentro = sesionActual(); if (yaDentro) ir(yaDentro);
 
   q('#ver').onchange = e => q('#p').type = e.target.checked ? 'text' : 'password';
