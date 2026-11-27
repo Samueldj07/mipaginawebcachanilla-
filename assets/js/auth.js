@@ -50,7 +50,8 @@ function cerrarSesion() {
 const ROLES = {
   'dueño':  { txt: 'Dueño/a',                   desc: 'panel, caja, menú y cuentas', inicio: 'panel.html' },
   'admin':  { txt: 'Administrador/a de cuentas', desc: 'solo cuentas y correos',      inicio: 'admin.html' },
-  'cajero': { txt: 'Cajero/a',                  desc: 'solo la caja',                inicio: 'pos.html' }
+  'cajero': { txt: 'Cajero/a',                  desc: 'caja y registro de horas',    inicio: 'pos.html' },
+  'empleado': { txt: 'Empleado/a',              desc: 'solo registro de horas',      inicio: 'horas.html' }
 };
 const rolTxt = r => (ROLES[r] || ROLES.cajero).txt;
 const inicioDe = r => (ROLES[r] || ROLES.cajero).inicio;

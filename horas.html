@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#12286b">
+<title>Registro de horas · La Cachanilla</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/marca/icono-32.png">
+<link rel="apple-touch-icon" href="assets/img/marca/icono-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+<script src="assets/js/cuentas.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>requerirSesion(['dueño', 'cajero', 'empleado', 'admin']);</script>
+<style>
+  .reloj{text-align:center;padding:26px 16px}
+  .reloj .hora{font-family:Fraunces,serif;font-size:clamp(48px,12vw,84px);font-weight:800;color:var(--cobalto-o);line-height:1}
+  .reloj .fecha{color:var(--gris);margin:6px 0 18px;text-transform:capitalize}
+  .estado{display:inline-block;padding:6px 14px;border-radius:999px;font-weight:700;font-size:14px;margin-bottom:18px}
+  .estado.dentro{background:var(--ok-l);color:var(--verde)}
+  .estado.fuera{background:var(--cielo);color:var(--cobalto-o)}
+  .ponchar{width:100%;max-width:420px;padding:22px;border-radius:18px;font-size:22px;font-weight:800;border:0;cursor:pointer;color:#fff}
+  .ponchar.entrar{background:var(--hoja,#1d8a4e)}
+  .ponchar.salir{background:var(--rosa)}
+  .ponchar:disabled{opacity:.5}
+  .nota-in{width:100%;max-width:420px;margin:12px auto 0;display:block;padding:10px 12px;border:1.5px solid var(--linea);border-radius:10px;font:inherit}
+  .marcas{width:100%;border-collapse:collapse;font-size:14px}
+  .marcas th,.marcas td{padding:8px 6px;border-bottom:1px solid var(--linea);text-align:left;white-space:nowrap}
+  .marcas th{font-size:12px;color:var(--gris);text-transform:uppercase}
+  .marcas td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .marcas tr.abierto td{background:#fff6dc}
+  .marcas input{padding:6px;border:1.5px solid var(--linea);border-radius:8px;font:inherit;font-size:13px}
+  .emp{margin-bottom:18px}
+  .emp h3{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin:0 0 10px}
+  .emp h3 small{font-weight:600;color:var(--gris);font-size:14px}
+  .totales-emp{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:10px;font-size:14px}
+  .totales-emp b{color:var(--cobalto-o)}
+  .mini{padding:5px 10px;font-size:13px;border-radius:8px}
+  .sync{font-size:13px;color:var(--gris);margin:0 0 14px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="adm-top">
+    <a class="marca" href="horas.html"><span class="pastilla"><img src="assets/img/marca/logo-nombre.webp" alt="La Cachanilla" width="480" height="146"></span><small>Registro de horas</small></a>
+    <span class="sp"></span>
+    <nav class="tabs">
+      <button data-v="ponchar" class="on">Ponchar</button>
+      <button data-v="mias">Mis horas</button>
+      <button data-v="equipo" class="solo-duenos" hidden>Horas del equipo</button>
+      <a href="panel.html" class="solo-duenos" hidden>Panel</a>
+      <a href="pos.html" class="solo-caja" hidden>Caja (POS)</a>
+      <button class="salir" onclick="cerrarSesion()">Salir</button>
+    </nav>
+  </header>
+
+  <div class="contenido">
+    <p class="sync" id="sync"></p>
+
+    <!-- PONCHAR -->
+    <section class="vista on" id="ponchar">
+      <div class="caja reloj">
+        <p style="margin:0 0 10px;font-weight:700" id="quien"></p>
+        <div class="hora" id="hora">--:--</div>
+        <div class="fecha" id="fecha"></div>
+        <div><span class="estado" id="estado"></span></div>
+        <button class="ponchar" id="btnPonchar"></button>
+        <input class="nota-in" id="notaPonche" placeholder="Nota (opcional): ej. llegué tarde por el tapón" maxlength="140">
+        <p class="sub" style="margin:16px 0 0;font-size:13px">¿Este equipo lo usan varias personas? Al terminar pulsa <b>Salir</b> para que el próximo empleado entre con su cuenta.</p>
+      </div>
+      <div class="caja" style="margin-top:16px">
+        <h3 style="margin-top:0">Hoy</h3>
+        <div class="tabla" id="hoyTabla"></div>
+      </div>
+    </section>
+
+    <!-- MIS HORAS -->
+    <section class="vista" id="mias">
+      <h2>Mis horas</h2>
+      <div class="fila" style="margin-bottom:14px">
+        <button class="b b-sec mini" data-sem="-1">← Semana anterior</button>
+        <b data-sem-txt></b>
+        <button class="b b-sec mini" data-sem="1">Semana siguiente →</button>
+      </div>
+      <div id="misHoras"></div>
+    </section>
+
+    <!-- EQUIPO (solo dueños) -->
+    <section class="vista" id="equipo">
+      <h2>Horas del equipo</h2>
+      <p class="sub">Semana de lunes a domingo. Puedes corregir una entrada o salida (queda anotado quién la cambió), añadir un turno olvidado y fijar la tarifa por hora de cada persona.</p>
+      <div class="fila" style="margin-bottom:14px">
+        <button class="b b-sec mini" data-sem="-1">← Semana anterior</button>
+        <b data-sem-txt></b>
+        <button class="b b-sec mini" data-sem="1">Semana siguiente →</button>
+        <span style="flex:1"></span>
+        <button class="b b-sec" id="eqCsv">Descargar CSV</button>
+        <button class="b b-sec" id="eqCopiar">Copiar resumen</button>
+        <button class="b b-rosa" id="eqWa">Enviar resumen por WhatsApp</button>
+      </div>
+      <div class="caja" style="margin-bottom:16px">
+        <h3 style="margin-top:0">Añadir turno a mano</h3>
+        <div class="fila">
+          <label class="campo">Empleado<select id="mEmp"></select></label>
+          <label class="campo">Entrada<input type="datetime-local" id="mEnt"></label>
+          <label class="campo">Salida<input type="datetime-local" id="mSal"></label>
+          <label class="campo" style="flex:1;min-width:160px">Nota<input id="mNota" placeholder="Motivo de la corrección"></label>
+          <button class="b b-pri" id="mAdd" style="align-self:flex-end">Añadir</button>
+        </div>
+      </div>
+      <div id="eqLista"></div>
+      <div class="aviso" style="margin-top:16px"><b>Horas extra:</b> se calculan a tiempo y medio por encima de 8 horas en un día o de 40 en la semana. Confirma la regla y las deducciones con tu contador antes de pagar.</div>
+    </section>
+  </div>
+</div>
+
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/admin-comun.js"></script>
+<script src="assets/js/github.js"></script>
+<script src="assets/js/horas.js"></script>
+</body>
+</html>
