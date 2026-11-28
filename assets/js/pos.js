@@ -168,8 +168,10 @@ function verRecibo(id, nueva) {
       <p style="text-align:center;margin:10px 0 0;font-size:13px">${esc(cfg.gracias)}</p>
     </div>
     <label class="campo" style="margin-top:12px">WhatsApp del cliente (opcional)<input id="waCli" type="tel" placeholder="787-000-0000"></label>
+    <label class="campo">Correo del cliente (opcional)<input id="mailCli" type="email" autocapitalize="none" placeholder="cliente@correo.com"></label>
     <div class="acciones">
       <button class="b b-sec" id="rWa">WhatsApp</button>
+      <button class="b b-sec" id="rMail">Correo</button>
       <button class="b b-sec" id="rImp">Imprimir</button>
       ${!nueva && !v.anulada && diaKey(v.ts) === hoyKey() ? '<button class="b b-rojo" id="rAnular">Anular</button>' : ''}
     </div>
@@ -178,6 +180,11 @@ function verRecibo(id, nueva) {
     let n = ($('#waCli').value || '').replace(/\D/g, '');
     if (n.length === 10) n = '1' + n;
     window.open('https://wa.me/' + n + '?text=' + encodeURIComponent(textoRecibo(v)), '_blank');
+  };
+  $('#rMail').onclick = () => {
+    const cli = ($('#mailCli').value || '').trim();
+    if (cli && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cli)) return toast('Correo del cliente no válido', true);
+    if (window.enviarReciboCorreo) enviarReciboCorreo(v, cli);
   };
   $('#rImp').onclick = () => window.print();
   const an = $('#rAnular');

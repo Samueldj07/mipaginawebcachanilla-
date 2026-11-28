@@ -10,7 +10,7 @@
    Si no hay internet, el aviso queda en cola y se reintenta.
    ===================================================================== */
 (() => {
-  const BASE = { activo: false, correo: 'lacachanillamx@outlook.com', correoOn: true, wa: '19393510339', waKey: '', waOn: true, anuladas: true };
+  const BASE = { activo: false, correo: 'lacachanillamx@outlook.com', copia: 'spm.biokinet@gmail.com', correoOn: true, wa: '19393510339', waKey: '', waOn: true, anuladas: true };
   const conf = () => {
     const g = store.get('avisos', {});
     if (g.correo === 'spm.biokinet@gmail.com') { g.correo = BASE.correo; store.set('avisos', g); }   // se cambió al correo del negocio
@@ -19,10 +19,11 @@
   const cola = () => store.get('avisos_cola', []);
   const guardarCola = c => store.set('avisos_cola', c.slice(-200));
 
-  async function porCorreo(c, asunto, texto) {
+  async function porCorreo(c, asunto, texto, extra) {
+    const cc = [c.copia, extra].filter(x => x && x !== c.correo).join(',');
     const r = await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(c.correo), {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ _subject: asunto, _template: 'box', _captcha: 'false', Recibo: texto })
+      body: JSON.stringify(Object.assign({ _subject: asunto, _template: 'box', _captcha: 'false', Recibo: texto }, cc ? { _cc: cc } : {}))
     });
     const j = await r.json().catch(() => ({}));
     if (!r.ok || String(j.success) === 'false') {
@@ -59,6 +60,20 @@
     pintarEstado();
   }
 
+  /* Botón "Correo" del recibo: envía el recibo a los correos del negocio y, si se escribe, al cliente */
+  window.enviarReciboCorreo = async (v, cliente) => {
+    const c = conf();
+    const asunto = `Recibo #${v.num} · ${money(v.total)} · La Cachanilla`;
+    const texto = textoRecibo(v);
+    if (navigator.onLine && c.correo) {
+      try { await porCorreo(c, asunto, texto, cliente); toast('Recibo enviado por correo' + (cliente ? ' (también al cliente)' : '')); return; }
+      catch (e) { toast(e.message, true); }
+    }
+    // Sin internet o sin activar: se abre el programa de correo del equipo
+    const para = cliente || c.copia || c.correo;
+    location.href = `mailto:${encodeURIComponent(para)}?${new URLSearchParams({ cc: cliente ? (c.copia || '') : '', subject: asunto, body: texto }).toString().replace(/\+/g, '%20')}`;
+  };
+
   /* Llamado por la caja al cobrar o anular */
   window.avisarVenta = (v, anulada) => {
     const c = conf(); if (!c.activo) return;
@@ -79,18 +94,18 @@
   }
   function pintar() {
     const c = conf();
-    $('#avOn').checked = c.activo; $('#avCorreoOn').checked = c.correoOn; $('#avCorreo').value = c.correo;
+    $('#avOn').checked = c.activo; $('#avCorreoOn').checked = c.correoOn; $('#avCorreo').value = c.correo; $('#avCopia').value = c.copia || '';
     $('#avWaOn').checked = c.waOn; $('#avWa').value = c.wa; $('#avKey').value = c.waKey; $('#avAnul').checked = c.anuladas;
     pintarEstado();
   }
   function leer() {
-    return { activo: $('#avOn').checked, correoOn: $('#avCorreoOn').checked, correo: $('#avCorreo').value.trim(),
+    return { activo: $('#avOn').checked, correoOn: $('#avCorreoOn').checked, correo: $('#avCorreo').value.trim(), copia: $('#avCopia').value.trim(),
       waOn: $('#avWaOn').checked, wa: $('#avWa').value.replace(/\D/g, ''), waKey: $('#avKey').value.trim(), anuladas: $('#avAnul').checked };
   }
   if ($('#avGuardar')) {
     $('#avGuardar').onclick = () => {
       const c = leer();
-      if (c.correoOn && c.correo && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(c.correo)) return toast('Correo no válido', true);
+      if (c.correoOn && [c.correo, c.copia].some(x => x && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x))) return toast('Correo no válido', true);
       if (c.waOn && c.wa.length < 10) return toast('Número de WhatsApp no válido (incluye el 1)', true);
       store.set('avisos', c); toast('Avisos guardados'); pintarEstado(); procesar();
     };
