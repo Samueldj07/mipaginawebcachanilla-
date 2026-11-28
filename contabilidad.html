@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#12286b">
+<title>Contabilidad · La Cachanilla</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/img/marca/icono-32.png">
+<link rel="apple-touch-icon" href="assets/img/marca/icono-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Lobster&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/admin.css">
+<script src="assets/js/cuentas.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+  /* El regreso de Microsoft trae ?code=… : se deja pasar para completar la conexión */
+  if (!/[?&](code|error)=/.test(location.search)) requerirSesion('dueño');
+</script>
+<style>
+  .marcas{width:100%;border-collapse:collapse;font-size:14px}
+  .marcas th,.marcas td{padding:8px 6px;border-bottom:1px solid var(--linea);text-align:left}
+  .marcas th{font-size:12px;color:var(--gris);text-transform:uppercase}
+  .marcas td.n,.marcas th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .marcas tr.tot td{font-weight:800;border-top:2px solid var(--tinta)}
+  .marcas tr.anulada td{color:var(--gris);text-decoration:line-through}
+  .dos{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media (max-width:820px){.dos{grid-template-columns:1fr}}
+  .mini{padding:6px 12px;font-size:13px;border-radius:8px}
+  .estado-sync{font-size:13px;color:var(--gris);margin:0 0 14px}
+  .ok{color:var(--verde);font-weight:700}.mal{color:var(--rojo);font-weight:700}
+  .pasos li{margin-bottom:6px}
+  code{background:#eef2fb;padding:1px 5px;border-radius:5px;font-size:12.5px;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="adm-top">
+    <a class="marca" href="panel.html"><span class="pastilla"><img src="assets/img/marca/logo-nombre.webp" alt="La Cachanilla" width="480" height="146"></span><small>Contabilidad</small></a>
+    <span class="sp"></span>
+    <nav class="tabs">
+      <button data-v="dia" class="on">Día</button>
+      <button data-v="mes">Mes</button>
+      <button data-v="gastos">Gastos</button>
+      <button data-v="docs">Documentos</button>
+      <a href="panel.html">Panel</a>
+      <a href="pos.html">Caja</a>
+      <button class="salir" onclick="cerrarSesion()">Salir</button>
+    </nav>
+  </header>
+
+  <div class="contenido">
+    <p class="estado-sync" id="sync"></p>
+
+    <!-- DÍA -->
+    <section class="vista on" id="dia">
+      <div class="fila" style="margin-bottom:14px">
+        <h2 style="margin:0;flex:1" id="diaTitulo">Día</h2>
+        <input type="date" id="diaSel" style="padding:9px;border:1.5px solid var(--linea);border-radius:10px;font:inherit">
+        <button class="b b-sec" id="diaSubir">Enviar a OneDrive</button>
+      </div>
+      <div class="kpis" id="diaKpis"></div>
+      <div class="dos">
+        <div class="caja"><h3 style="margin-top:0">Cobrado por método</h3><div id="diaMetodos"></div></div>
+        <div class="caja"><h3 style="margin-top:0">Gastos del día</h3><div id="diaGastos"></div>
+          <button class="b b-sec mini" data-ir="gastos" style="margin-top:10px">+ Registrar gasto</button></div>
+      </div>
+      <div class="caja" style="margin-top:16px"><h3 style="margin-top:0">Ventas</h3><div class="tabla" id="diaVentas"></div></div>
+    </section>
+
+    <!-- MES -->
+    <section class="vista" id="mes">
+      <div class="fila" style="margin-bottom:14px">
+        <h2 style="margin:0;flex:1;text-transform:capitalize" id="mesTitulo">Mes</h2>
+        <input type="month" id="mesSel" style="padding:9px;border:1.5px solid var(--linea);border-radius:10px;font:inherit">
+        <button class="b b-sec" id="mesCsv">Libro (CSV)</button>
+        <button class="b b-sec" id="mesHtml">Resumen</button>
+        <button class="b b-rosa" id="mesSubir">Enviar a OneDrive</button>
+      </div>
+      <div class="kpis" id="mesKpis"></div>
+      <div class="dos">
+        <div class="caja"><h3 style="margin-top:0">Estado de resultados</h3><div id="mesPyg"></div></div>
+        <div class="caja"><h3 style="margin-top:0">IVU del mes</h3><div id="mesIvu"></div></div>
+      </div>
+      <div class="caja" style="margin-top:16px"><h3 style="margin-top:0">Por día</h3><div class="tabla" id="mesDias"></div></div>
+    </section>
+
+    <!-- GASTOS -->
+    <section class="vista" id="gastos">
+      <h2>Gastos</h2>
+      <p class="sub">Todo lo que se paga: ingredientes, gas, renta, nómina, comisiones… Guarda el número de factura o recibo del suplidor.</p>
+      <div class="caja" style="margin-bottom:16px">
+        <div class="fila">
+          <label class="campo">Fecha<input type="date" id="gFecha"></label>
+          <label class="campo">Categoría<select id="gCat"></select></label>
+          <label class="campo" style="flex:1;min-width:180px">Descripción<input id="gDesc" placeholder="Ej. harina 50 lb, huevos"></label>
+          <label class="campo">Suplidor<input id="gSup" placeholder="Ej. Costco"></label>
+          <label class="campo">Monto ($)<input type="number" step="0.01" min="0" id="gMonto" inputmode="decimal" style="width:110px"></label>
+          <label class="campo">Pagado con<select id="gMet"><option>Efectivo</option><option>ATH Móvil</option><option>Tarjeta</option><option>Transferencia</option><option>Cheque</option></select></label>
+          <label class="campo">Factura / recibo #<input id="gFac" style="width:120px"></label>
+          <button class="b b-pri" id="gAdd" style="align-self:flex-end">Añadir gasto</button>
+        </div>
+      </div>
+      <div class="fila" style="margin-bottom:10px"><label class="campo">Mes<input type="month" id="gMes" style="padding:8px;border:1.5px solid var(--linea);border-radius:10px"></label></div>
+      <div class="caja"><div class="tabla" id="gLista"></div></div>
+    </section>
+
+    <!-- DOCUMENTOS -->
+    <section class="vista" id="docs">
+      <h2>Documentos en OneDrive</h2>
+      <p class="sub">Cada venta actualiza en OneDrive el archivo de ventas del día, el cierre del día, el libro del mes y el resumen del mes, en <code>La Cachanilla/Contabilidad/AAAA-MM/</code>.</p>
+      <div class="dos">
+        <div class="caja">
+          <h3 style="margin-top:0">Conexión</h3>
+          <p id="odEstado"></p>
+          <label class="chk"><input type="checkbox" id="odAuto"> Subir automáticamente después de cada venta (en este equipo)</label>
+          <div class="fila" style="margin-top:12px">
+            <button class="b b-rosa" id="odEntrar">Conectar OneDrive</button>
+            <button class="b b-sec" id="odAhora">Subir pendientes</button>
+            <button class="b b-sec" id="odTodo">Regenerar el mes</button>
+            <button class="b b-rojo mini" id="odSalir">Desconectar</button>
+          </div>
+          <p class="sub" id="odCola" style="margin:12px 0 0;font-size:13px"></p>
+        </div>
+        <div class="caja">
+          <h3 style="margin-top:0">Configurar (una sola vez)</h3>
+          <ol class="pasos" style="padding-left:18px;font-size:14px;line-height:1.6;margin:0">
+            <li>Entra a <a href="https://entra.microsoft.com" target="_blank" rel="noopener">entra.microsoft.com</a> con <b>lacachanillamx@outlook.com</b>.</li>
+            <li><b>Applications → App registrations → New registration</b>. Nombre: <i>Contabilidad La Cachanilla</i>.</li>
+            <li>En <b>Supported account types</b> escoge <b>Personal Microsoft accounts only</b>.</li>
+            <li>En <b>Redirect URI</b> escoge <b>Single-page application (SPA)</b> y pega: <code id="odRedir"></code></li>
+            <li>Pulsa <b>Register</b>, copia el <b>Application (client) ID</b> y pégalo aquí:</li>
+          </ol>
+          <div class="fila" style="margin-top:8px"><input id="odClient" placeholder="00000000-0000-0000-0000-000000000000" style="flex:1;padding:10px;border:1.5px solid var(--linea);border-radius:10px;font:inherit" autocapitalize="none">
+            <button class="b b-pri" id="odGuardarId">Guardar</button></div>
+          <p class="sub" style="font-size:12.5px;margin:8px 0 0">Ese ID no es secreto. Mándamelo y lo dejo fijo en la página para que no haya que pegarlo en cada equipo.</p>
+        </div>
+      </div>
+      <div class="aviso" style="margin-top:16px">Microsoft pide <b>volver a conectar cerca de cada 24 horas</b> en páginas web. Si la conexión vence, los documentos quedan en cola en este equipo y se suben al reconectar.</div>
+    </section>
+  </div>
+</div>
+
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/admin-comun.js"></script>
+<script src="assets/js/github.js"></script>
+<script src="assets/js/onedrive.js"></script>
+<script src="assets/js/contab.js"></script>
+<script>
+(async () => {
+  /* Regreso de Microsoft */
+  try { const volver = await OD.completarEntrada(); if (volver) { toast('OneDrive conectado'); OD.procesar(); if (!/contabilidad\.html/.test(volver)) { location.replace(volver); return; } } }
+  catch (e) { toast(e.message, true); }
+  if (!sesionActual() || sesionActual().rol !== 'dueño') { requerirSesion('dueño'); return; }
+
+  const hoy = hoyKey();
+  $('#diaSel').value = hoy; $('#mesSel').value = $('#gMes').value = hoy.slice(0, 7); $('#gFecha').value = hoy;
+  $('#gCat').innerHTML = CONTA.CATEGORIAS.map(c => `<option>${esc(c)}</option>`).join('');
+  $('#odRedir').textContent = OD.redirect();
+  const t2 = (filas, tot) => `<table class="marcas">${filas.map(([a, b]) => `<tr><td>${esc(a)}</td><td class="n">${b}</td></tr>`).join('')}${tot ? `<tr class="tot"><td>${esc(tot[0])}</td><td class="n">${tot[1]}</td></tr>` : ''}</table>`;
+  const kpi = (t, v) => `<div class="kpi"><span>${t}</span><b>${v}</b></div>`;
+
+  function pintarDia() {
+    const d = $('#diaSel').value || hoy, x = CONTA.dia(d);
+    $('#diaTitulo').textContent = CONTA.fLarga(d).replace(/^./, c => c.toUpperCase());
+    $('#diaKpis').innerHTML = kpi('Ventas (sin IVU)', money(x.ingresos)) + kpi('IVU cobrado', money(x.ivu)) + kpi('Gastos', money(x.gastos)) + kpi('Resultado', money(x.neto));
+    const met = Object.entries(x.r.metodos).map(([k, v]) => [k, money(v)]);
+    if (x.cc.length) met.push(['Comercios (facturas)', money(x.cc.reduce((s, c) => s + c.total, 0))]);
+    $('#diaMetodos').innerHTML = met.length ? t2(met, ['Total cobrado', money(x.cobrado)]) : '<p class="vacio">Sin cobros.</p>';
+    $('#diaGastos').innerHTML = x.gs.length ? t2(x.gs.map(g => [`${g.categoria} · ${g.descripcion || ''}`, money(Number(g.monto))]), ['Total', money(x.gastos)]) : '<p class="sub" style="margin:0">Sin gastos registrados.</p>';
+    $('#diaVentas').innerHTML = x.ventas.length || x.cc.length ? `<table class="marcas"><tr><th>Recibo</th><th>Hora</th><th>Productos</th><th>Método</th><th class="n">IVU</th><th class="n">Total</th></tr>` +
+      x.ventas.map(v => `<tr class="${v.anulada ? 'anulada' : ''}"><td>#${v.num}</td><td>${hora(v.ts)}</td><td style="font-size:13px">${esc(v.lineas.map(l => l.q + '× ' + l.nombre).join(', '))}</td><td>${esc(v.metodo)}</td><td class="n">${money(v.ivu)}</td><td class="n">${money(v.total)}</td></tr>`).join('') +
+      x.cc.map(c => `<tr><td>${esc(c.recibo)}</td><td></td><td style="font-size:13px">Comercio: ${esc(c.cliente || '')} · ${esc(c.factura)}</td><td>${esc(c.metodo || '')}</td><td class="n">${money(c.ivu)}</td><td class="n">${money(c.total)}</td></tr>`).join('') + '</table>'
+      : '<p class="vacio">No hay ventas este día en las cajas sincronizadas.</p>';
+  }
+  function pintarMes() {
+    const m = $('#mesSel').value || hoy.slice(0, 7), M = CONTA.mes(m);
+    $('#mesTitulo').textContent = CONTA.nomMes(m);
+    $('#mesKpis').innerHTML = kpi('Ingresos (sin IVU)', money(M.ingresos)) + kpi('Gastos', money(M.gastos)) + kpi('Resultado', money(M.neto)) + kpi('IVU a remitir', money(M.ivu));
+    $('#mesPyg').innerHTML = t2([['Ventas e ingresos', money(M.ingresos)], ...Object.entries(M.porCat).sort((a, b) => b[1] - a[1]).map(([k, v]) => ['− ' + k, money(v)])], ['Resultado del mes', money(M.neto)]) +
+      (M.nomina && !M.nominaRegistrada ? `<p class="sub" style="font-size:13px;margin:10px 0 0">Nómina estimada del Registro de horas: <b>${money(M.nomina)}</b>. Regístrala como gasto “Nómina” al pagarla. Resultado si se paga: <b>${money(M.neto - M.nomina)}</b>.</p>` : '');
+    $('#mesIvu').innerHTML = t2([['IVU cobrado en caja', money(M.dias.reduce((s, x) => s + x.r.ivu, 0))], ['IVU en cobros a comercios', money(M.dias.reduce((s, x) => s + x.cc.reduce((a, c) => a + c.ivu, 0), 0))]], ['A remitir a Hacienda', money(M.ivu)]) +
+      '<p class="sub" style="font-size:13px;margin:10px 0 0">Se declara y paga en la planilla mensual de IVU en SURI. Confírmalo con tu contador.</p>';
+    $('#mesDias').innerHTML = M.dias.length ? `<table class="marcas"><tr><th>Día</th><th class="n">Ingresos</th><th class="n">IVU</th><th class="n">Gastos</th><th class="n">Resultado</th></tr>` +
+      M.dias.map(x => `<tr><td><a href="#" data-dia="${x.d}">${esc(x.d)}</a></td><td class="n">${money(x.ingresos)}</td><td class="n">${money(x.ivu)}</td><td class="n">${money(x.gastos)}</td><td class="n">${money(x.neto)}</td></tr>`).join('') +
+      `<tr class="tot"><td>Total</td><td class="n">${money(M.ingresos)}</td><td class="n">${money(M.ivu)}</td><td class="n">${money(M.gastos)}</td><td class="n">${money(M.neto)}</td></tr></table>` : '<p class="vacio">Sin movimientos este mes.</p>';
+  }
+  function pintarGastos() {
+    const m = $('#gMes').value, gs = CONTA.gastos().filter(g => g.fecha.startsWith(m));
+    $('#gLista').innerHTML = gs.length ? `<table class="marcas"><tr><th>Fecha</th><th>Categoría</th><th>Descripción</th><th>Suplidor</th><th>Pago</th><th>Factura</th><th class="n">Monto</th><th></th></tr>` +
+      gs.map(g => `<tr><td>${esc(g.fecha)}</td><td>${esc(g.categoria)}</td><td>${esc(g.descripcion || '')}</td><td>${esc(g.suplidor || '')}</td><td>${esc(g.metodo || '')}</td><td>${esc(g.factura || '')}</td><td class="n">${money(Number(g.monto))}</td><td><button class="b b-rojo mini" data-borrar="${g.id}">Borrar</button></td></tr>`).join('') +
+      `<tr class="tot"><td colspan="6">Total</td><td class="n">${money(gs.reduce((s, g) => s + Number(g.monto), 0))}</td><td></td></tr></table>` : '<p class="vacio">Sin gastos este mes.</p>';
+  }
+  function pintarDocs() {
+    const c = OD.conectado();
+    $('#odEstado').innerHTML = !OD.clientId() ? '<span class="mal">Falta configurar</span> (pasos a la derecha).'
+      : c ? `<span class="ok">✓ Conectado</span>${OD.cuenta() ? ' como ' + esc(OD.cuenta()) : ''}${OD.ultima() ? ' · última subida ' + fecha(OD.ultima()) + ' ' + hora(OD.ultima()) : ''}`
+      : '<span class="mal">No conectado en este equipo.</span>';
+    $('#odClient').value = OD.clientId(); $('#odAuto').checked = store.get('conta_auto', true);
+    const p = OD.pendientes();
+    $('#odCola').textContent = p.length ? `${p.length} documento(s) esperando: ${p.slice(0, 6).join(', ')}${p.length > 6 ? '…' : ''}${OD.error() ? ' · ' + OD.error() : ''}` : '✓ No hay documentos pendientes.';
+  }
+  function pintarSync() {
+    $('#sync').innerHTML = CONTA.listo() ? '✓ Datos compartidos con las demás cajas (repositorio privado).' :
+      '<span class="mal">⚠ Este equipo no está conectado al repositorio privado:</span> solo ves las ventas de esta caja. Conéctalo en Administración → Conexión y en Comercios.';
+  }
+  const pintarTodo = () => { pintarSync(); pintarDia(); pintarMes(); pintarGastos(); pintarDocs(); };
+
+  /* acciones */
+  $('#diaSel').onchange = pintarDia; $('#mesSel').onchange = pintarMes; $('#gMes').onchange = pintarGastos;
+  $('#mesDias').addEventListener('click', e => { const a = e.target.closest('[data-dia]'); if (!a) return; e.preventDefault(); $('#diaSel').value = a.dataset.dia; ir('dia'); });
+  $('#diaSubir').onclick = () => { CONTA.documentosDe($('#diaSel').value || hoy); toast(OD.conectado() ? 'Enviando a OneDrive…' : 'Guardado en cola: conecta OneDrive'); pintarDocs(); };
+  $('#mesSubir').onclick = $('#odTodo').onclick = () => { const m = $('#mesSel').value; CONTA.mes(m).dias.forEach(x => CONTA.documentosDe(x.d)); CONTA.documentosDe(m + '-01'); toast(OD.conectado() ? 'Enviando el mes a OneDrive…' : 'Guardado en cola: conecta OneDrive'); pintarDocs(); };
+  $('#mesCsv').onclick = () => descargar(`libro-${$('#mesSel').value}.csv`, CONTA.csvLibroMes($('#mesSel').value), 'text/csv;charset=utf-8');
+  $('#mesHtml').onclick = () => { const w = window.open('', '_blank'); w.document.write(CONTA.htmlResumenMes($('#mesSel').value)); w.document.close(); };
+  $('#gAdd').onclick = async () => {
+    const monto = Number($('#gMonto').value), fechaG = $('#gFecha').value;
+    if (!fechaG || !(monto > 0)) return toast('Pon la fecha y el monto', true);
+    const g = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 5), fecha: fechaG, categoria: $('#gCat').value, descripcion: $('#gDesc').value.trim(),
+      suplidor: $('#gSup').value.trim(), monto: r2(monto), metodo: $('#gMet').value, factura: $('#gFac').value.trim(), por: sesionActual().nombre, mod: Date.now() };
+    CONTA.guardarGastos([...CONTA.datos().gastos, g]);
+    ['#gDesc', '#gSup', '#gMonto', '#gFac'].forEach(s => $(s).value = '');
+    toast('Gasto registrado'); pintarTodo();
+    if (store.get('conta_auto', true)) CONTA.documentosDe(fechaG);
+    try { await CONTA.sincronizarGastos(); } catch (e) { toast('No se pudo compartir: ' + e.message, true); }
+  };
+  $('#gLista').addEventListener('click', async e => {
+    const b = e.target.closest('[data-borrar]'); if (!b || !confirm('¿Borrar este gasto?')) return;
+    const todos = CONTA.datos().gastos, g = todos.find(x => x.id === b.dataset.borrar);
+    Object.assign(g, { borrado: true, mod: Date.now() }); CONTA.guardarGastos(todos); pintarTodo();
+    if (store.get('conta_auto', true)) CONTA.documentosDe(g.fecha);
+    try { await CONTA.sincronizarGastos(); } catch (e) {}
+  });
+  $('#odGuardarId').onclick = () => { const v = $('#odClient').value.trim(); if (v && !/^[0-9a-f-]{36}$/i.test(v)) return toast('Ese no parece un Client ID', true); OD.ponerClientId(v); toast('Guardado'); pintarDocs(); };
+  $('#odEntrar').onclick = () => OD.entrar(location.href).catch(e => toast(e.message, true));
+  $('#odSalir').onclick = () => { OD.salir(); pintarDocs(); };
+  $('#odAhora').onclick = () => { if (!OD.conectado()) return toast('Primero conecta OneDrive', true); OD.procesar(); toast('Subiendo…'); };
+  $('#odAuto').onchange = e => store.set('conta_auto', e.target.checked);
+  document.addEventListener('onedrive', pintarDocs);
+  $$('[data-ir]').forEach(b => b.onclick = () => ir(b.dataset.ir));
+
+  function ir(v) {
+    $$('.tabs button[data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    $$('.vista').forEach(x => x.classList.toggle('on', x.id === v)); pintarTodo();
+  }
+  $$('.tabs button[data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));
+  pintarTodo();
+  try { await Promise.all([CONTA.sincronizarVentas(), CONTA.sincronizarGastos()]); pintarTodo(); } catch (e) { $('#sync').innerHTML += ' <span class="mal">No se pudo sincronizar: ' + esc(e.message) + '</span>'; }
+  OD.procesar();
+})();
+</script>
+</body>
+</html>
