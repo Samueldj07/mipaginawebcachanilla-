@@ -25,7 +25,7 @@ function catalogoActivo() {
 function marcarBaseCatalogo(v) { store.set('catalogo_base', v || window.CACHANILLA.actualizado || ''); }
 
 const AJUSTES_BASE = {
-  estatal: 10.5, municipal: 1.0, incluido: false,
+  estatal: 10.5, municipal: 1.0, incluido: false, ivu115: true,
   negocio: 'La Cachanilla', telefono: '', lugar: '',
   gracias: '¡Gracias por tu compra! Un antojo mexicano, donde quiera que vayamos.'
 };
