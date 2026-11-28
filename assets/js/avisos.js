@@ -10,8 +10,12 @@
    Si no hay internet, el aviso queda en cola y se reintenta.
    ===================================================================== */
 (() => {
-  const BASE = { activo: false, correo: 'spm.biokinet@gmail.com', correoOn: true, wa: '19393510339', waKey: '', waOn: true, anuladas: true };
-  const conf = () => Object.assign({}, BASE, store.get('avisos', {}));
+  const BASE = { activo: false, correo: 'lacachanillamx@outlook.com', correoOn: true, wa: '19393510339', waKey: '', waOn: true, anuladas: true };
+  const conf = () => {
+    const g = store.get('avisos', {});
+    if (g.correo === 'spm.biokinet@gmail.com') { g.correo = BASE.correo; store.set('avisos', g); }   // se cambió al correo del negocio
+    return Object.assign({}, BASE, g);
+  };
   const cola = () => store.get('avisos_cola', []);
   const guardarCola = c => store.set('avisos_cola', c.slice(-200));
 
