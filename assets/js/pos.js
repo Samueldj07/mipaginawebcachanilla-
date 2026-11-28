@@ -140,6 +140,7 @@ function completar() {
   verRecibo(v.id, true);
   toast('Venta #' + num + ' guardada');
   if (window.avisarVenta) avisarVenta(v);
+  if (typeof CONTA !== 'undefined') CONTA.trasVenta(v);
 }
 
 /* ---------- Recibo ---------- */
@@ -182,8 +183,8 @@ function verRecibo(id, nueva) {
   const an = $('#rAnular');
   if (an) an.onclick = () => {
     if (!confirm('¿Anular la venta #' + v.num + '? No contará en el cierre.')) return;
-    const lista = ventas(); const x = lista.find(y => y.id === v.id); x.anulada = true; x.anuladaTs = Date.now();
-    store.set('pos_ventas', lista); toast('Venta anulada'); if (window.avisarVenta) avisarVenta(v, true); verRecibo(v.id); pintarHoy();
+    const lista = ventas(); const x = lista.find(y => y.id === v.id); x.anulada = true; x.anuladaTs = x.mod = Date.now();
+    store.set('pos_ventas', lista); toast('Venta anulada'); if (window.avisarVenta) avisarVenta(v, true); if (typeof CONTA !== 'undefined') CONTA.trasVenta(x); verRecibo(v.id); pintarHoy();
   };
   abrir('ovRecibo');
 }
@@ -318,5 +319,5 @@ window.addEventListener('storage', e => { if (e.key === 'cach_catalogo_borrador'
 pintarCatalogo(); pintarOrden();
 
 /* Cajeros no ven el enlace al panel */
-(() => { const s = sesionActual(); if (s && s.rol !== 'dueño') $$('a[href="panel.html"]').forEach(a => a.style.display = 'none');
+(() => { const s = sesionActual(); if (s && s.rol !== 'dueño') $$('a[href="panel.html"], a[href="contabilidad.html"]').forEach(a => a.style.display = 'none');
   const m = $('.adm-top .marca'); if (m && s && s.rol !== 'dueño') m.removeAttribute('href'); })();
