@@ -139,6 +139,7 @@ function completar() {
   orden = {}; cerrar('ovPago'); pintarCatalogo(); pintarOrden();
   verRecibo(v.id, true);
   toast('Venta #' + num + ' guardada');
+  if (window.avisarVenta) avisarVenta(v);
 }
 
 /* ---------- Recibo ---------- */
@@ -182,7 +183,7 @@ function verRecibo(id, nueva) {
   if (an) an.onclick = () => {
     if (!confirm('¿Anular la venta #' + v.num + '? No contará en el cierre.')) return;
     const lista = ventas(); const x = lista.find(y => y.id === v.id); x.anulada = true; x.anuladaTs = Date.now();
-    store.set('pos_ventas', lista); toast('Venta anulada'); verRecibo(v.id); pintarHoy();
+    store.set('pos_ventas', lista); toast('Venta anulada'); if (window.avisarVenta) avisarVenta(v, true); verRecibo(v.id); pintarHoy();
   };
   abrir('ovRecibo');
 }

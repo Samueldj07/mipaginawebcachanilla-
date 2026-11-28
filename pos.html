@@ -87,6 +87,29 @@
         <button class="b b-pri" id="aGuardar">Guardar ajustes</button>
       </div>
       <div class="caja">
+        <h3>Avisos automáticos de cada venta</h3>
+        <p class="sub" style="font-size:14px">Al cobrar, el recibo se envía solo por correo y por WhatsApp. Se configura en <b>cada equipo</b> que cobra.</p>
+        <label class="chk"><input type="checkbox" id="avOn"> Enviar el recibo de cada venta automáticamente</label>
+        <div class="fila" style="margin-top:10px">
+          <label class="chk"><input type="checkbox" id="avCorreoOn"> Correo</label>
+          <label class="campo" style="flex:1;min-width:220px"><input id="avCorreo" type="email" autocapitalize="none" placeholder="correo@ejemplo.com"></label>
+        </div>
+        <div class="fila">
+          <label class="chk"><input type="checkbox" id="avWaOn"> WhatsApp</label>
+          <label class="campo" style="min-width:160px">Número (con el 1)<input id="avWa" inputmode="tel" placeholder="19393510339"></label>
+          <label class="campo" style="flex:1;min-width:160px">Apikey de CallMeBot<input id="avKey" autocapitalize="none" autocomplete="off" placeholder="la que llega por WhatsApp"></label>
+        </div>
+        <label class="chk"><input type="checkbox" id="avAnul"> Avisar también cuando se anula una venta</label>
+        <details style="margin:10px 0;font-size:14px"><summary><b>Cómo activarlo (una sola vez)</b></summary>
+          <ol style="padding-left:18px;line-height:1.7">
+            <li><b>Correo:</b> pulsa <b>Probar</b>. Llegará un correo de FormSubmit a esa dirección: ábrelo y pulsa <b>Activate Form</b>. Desde ahí llegan solos (revisa también Spam).</li>
+            <li><b>WhatsApp:</b> desde el teléfono de Karen, entra a <a href="https://www.callmebot.com/blog/free-api-whatsapp-messages/" target="_blank" rel="noopener">callmebot.com</a>, guarda el número del bot que aparece allí y envíale por WhatsApp: <i>I allow callmebot to send me messages</i>. El bot responde con una <b>apikey</b>: pégala aquí, guarda y pulsa <b>Probar</b>.</li>
+          </ol>
+        </details>
+        <div class="fila"><button class="b b-pri" id="avGuardar">Guardar avisos</button><button class="b b-sec" id="avProbar">Probar</button></div>
+        <p class="sub" id="avEstado" style="margin:10px 0 0;font-size:13px"></p>
+      </div>
+      <div class="caja">
         <h3>Respaldo de ventas</h3>
         <p class="sub" style="font-size:14px">Las ventas viven en este equipo. Descarga un respaldo cada semana.</p>
         <div class="fila">
@@ -122,5 +145,6 @@
 <script src="assets/js/catalogo.js"></script>
 <script src="assets/js/admin-comun.js"></script>
 <script src="assets/js/pos.js"></script>
+<script src="assets/js/avisos.js"></script>
 </body>
 </html>
