@@ -46,7 +46,7 @@ window.CACHANILLA = {
       "ivu": 11.5
     }
   },
-  "actualizado": "2026-11-26T16:20:00",
+  "actualizado": "2026-11-28T10:45:00",
   "semana": "Menú del sábado 28 de noviembre",
   "pedidosNota": "Aparta tu pan para el sábado 28 de noviembre. Te confirmamos por WhatsApp. Los tamales y el pan de muerto son de cantidad limitada.",
   "diasPedido": [
@@ -68,16 +68,6 @@ window.CACHANILLA = {
   ],
   "productos": [
     {
-      "id": "p3",
-      "nombre": "Bisquet de mantequilla",
-      "precio": 3.5,
-      "cat": "Pan dulce",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/bisquet.jpg",
-      "desc": "Esponjoso, dorado y con mucha mantequilla."
-    },
-    {
       "id": "p2",
       "nombre": "Marranitos de piloncillo",
       "precio": 2.5,
@@ -88,14 +78,92 @@ window.CACHANILLA = {
       "desc": "Cochinitos de piloncillo y especias, suaves por dentro."
     },
     {
-      "id": "p13",
-      "nombre": "Pan de muerto (cantidad limitada)",
+      "id": "p14",
+      "nombre": "Cortadillo (pastel rosa)",
       "precio": 3.5,
       "cat": "Pan dulce",
       "disponible": true,
       "destacado": false,
-      "img": "assets/img/productos/pan-muerto.jpg",
-      "desc": "Tradición mexicana con azahar y azúcar."
+      "img": "assets/img/productos/cortadillo.jpg",
+      "desc": "Cuadrito de pastel esponjoso con su cubierta rosa."
+    },
+    {
+      "id": "e1",
+      "nombre": "Elotito de canela (pan fino)",
+      "precio": 4,
+      "cat": "Pan fino",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/elotito.jpg",
+      "desc": "Pan fino en forma de elote, con canela."
+    },
+    {
+      "id": "e2",
+      "nombre": "Cuernitos de canela (pan fino)",
+      "precio": 4,
+      "cat": "Pan fino",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/cuernito.jpg",
+      "desc": "Cuernito de pan fino con canela, dorado y suave."
+    },
+    {
+      "id": "e3",
+      "nombre": "Pericos",
+      "precio": 4,
+      "cat": "Pan fino",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/pericos.jpg",
+      "desc": "Pan fino relleno de crema pastelera o de piña.",
+      "opciones": [
+        "Crema pastelera",
+        "Piña"
+      ]
+    },
+    {
+      "id": "e10",
+      "nombre": "Troncos de canela (pan fino)",
+      "precio": 4,
+      "cat": "Pan fino",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/troncos-canela.jpg",
+      "desc": "Troncos de pan fino con canela."
+    },
+    {
+      "id": "p1",
+      "nombre": "Concha",
+      "precio": 3.5,
+      "cat": "Pan dulce",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/concha.jpg",
+      "desc": "El clásico: pan suave con su costra de azúcar en chocolate o vainilla.",
+      "opciones": [
+        "Chocolate",
+        "Vainilla"
+      ]
+    },
+    {
+      "id": "e11",
+      "nombre": "Panqué de plátano con nuez y chocolate",
+      "precio": 3.5,
+      "cat": "Pan dulce",
+      "disponible": true,
+      "destacado": true,
+      "img": "assets/img/productos/panque-platano.jpg",
+      "desc": "Panqué húmedo de plátano con nuez y chocolate."
+    },
+    {
+      "id": "p9",
+      "nombre": "Piedras con chocolate",
+      "precio": 3,
+      "cat": "Pan dulce",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/piedra.jpg",
+      "desc": "Crujientes, con chocolate."
     },
     {
       "id": "e5",
@@ -113,30 +181,6 @@ window.CACHANILLA = {
       ]
     },
     {
-      "id": "p9",
-      "nombre": "Piedras con chocolate",
-      "precio": 3,
-      "cat": "Pan dulce",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/piedra.jpg",
-      "desc": "Crujientes, con chocolate."
-    },
-    {
-      "id": "e3",
-      "nombre": "Pericos",
-      "precio": 4,
-      "cat": "Pan fino",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/pericos.jpg",
-      "desc": "Pan fino relleno de crema pastelera o de piña.",
-      "opciones": [
-        "Crema pastelera",
-        "Piña"
-      ]
-    },
-    {
       "id": "e6",
       "nombre": "Niño envuelto (fresa y coco)",
       "precio": 4.5,
@@ -147,8 +191,48 @@ window.CACHANILLA = {
       "desc": "Rollo de pastel esponjoso relleno de fresa con coco."
     },
     {
+      "id": "p16",
+      "nombre": "Polvorón tricolor",
+      "precio": 1.5,
+      "cat": "Pan dulce",
+      "disponible": true,
+      "destacado": false,
+      "img": "",
+      "desc": "Galleta de polvorón en tres colores."
+    },
+    {
+      "id": "p13",
+      "nombre": "Pan de muerto (cantidad limitada)",
+      "precio": 3.5,
+      "cat": "Pan dulce",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/pan-muerto.jpg",
+      "desc": "Tradición mexicana con azahar y azúcar."
+    },
+    {
+      "id": "p3",
+      "nombre": "Bisquet de mantequilla",
+      "precio": 3.5,
+      "cat": "Pan dulce",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/bisquet.jpg",
+      "desc": "Esponjoso, dorado y con mucha mantequilla."
+    },
+    {
+      "id": "e8",
+      "nombre": "Bolillo natural",
+      "precio": 2.5,
+      "cat": "Pan salado",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/bolillo.jpg",
+      "desc": "El pan blanco clásico de México: crujiente por fuera y suave por dentro."
+    },
+    {
       "id": "p5",
-      "nombre": "Telera mini queso y jalapeño",
+      "nombre": "Bolillo mini queso y jalapeño",
       "precio": 2.5,
       "cat": "Pan salado",
       "disponible": true,
@@ -167,84 +251,34 @@ window.CACHANILLA = {
       "desc": "Mini bolillo relleno de queso y pepperoni."
     },
     {
-      "id": "e8",
-      "nombre": "Bolillo natural",
-      "precio": 2.5,
-      "cat": "Pan salado",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/bolillo.jpg",
-      "desc": "El pan blanco clásico de México: crujiente por fuera y suave por dentro."
-    },
-    {
-      "id": "p4",
-      "nombre": "Telera natural",
-      "precio": 2.5,
-      "cat": "Pan salado",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/telera.jpg",
-      "desc": "Pan salado tradicional, perfecto para tortas."
-    },
-    {
-      "id": "e1",
-      "nombre": "Elotito de canela (pan fino)",
-      "precio": 4,
-      "cat": "Pan fino",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/elotito.jpg",
-      "desc": "Pan fino en forma de elote, con canela."
-    },
-    {
-      "id": "e10",
-      "nombre": "Troncos de canela (pan fino)",
-      "precio": 4,
-      "cat": "Pan fino",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/troncos-canela.jpg",
-      "desc": "Troncos de pan fino con canela."
-    },
-    {
-      "id": "e2",
-      "nombre": "Cuernitos de canela (pan fino)",
-      "precio": 4,
-      "cat": "Pan fino",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/cuernito.jpg",
-      "desc": "Cuernito de pan fino con canela, dorado y suave."
-    },
-    {
-      "id": "e11",
-      "nombre": "Panqué de plátano con nuez y chocolate",
-      "precio": 3.5,
-      "cat": "Pan dulce",
-      "disponible": true,
-      "destacado": true,
-      "img": "assets/img/productos/panque-platano.jpg",
-      "desc": "Panqué húmedo de plátano con nuez y chocolate."
-    },
-    {
-      "id": "p14",
-      "nombre": "Cortadillo (pastel rosa)",
-      "precio": 3.5,
-      "cat": "Pan dulce",
-      "disponible": true,
-      "destacado": false,
-      "img": "assets/img/productos/cortadillo.jpg",
-      "desc": "Cuadrito de pastel esponjoso con su cubierta rosa."
-    },
-    {
       "id": "e12",
-      "nombre": "Tamales rojos de rajas con queso (cantidad limitada)",
+      "nombre": "Tamales de rajas con queso (cantidad limitada)",
       "precio": 4,
       "cat": "Tamales",
       "disponible": true,
       "destacado": true,
       "img": "assets/img/productos/tamales-rojos.jpg",
       "desc": "Tamal de masa roja relleno de rajas de chile con queso. ¡Cantidad limitada!"
+    },
+    {
+      "id": "e13",
+      "nombre": "Tamales de rajas con queso · 6 piezas",
+      "precio": 21,
+      "cat": "Tamales",
+      "disponible": true,
+      "destacado": false,
+      "img": "assets/img/productos/tamales-rojos.jpg",
+      "desc": "Media docena de tamales de rajas con queso. Cantidad limitada."
+    },
+    {
+      "id": "p4",
+      "nombre": "Telera natural",
+      "precio": 2.5,
+      "cat": "Pan salado",
+      "disponible": false,
+      "destacado": false,
+      "img": "assets/img/productos/telera.jpg",
+      "desc": "Pan salado tradicional, perfecto para tortas."
     },
     {
       "id": "e4",
@@ -255,20 +289,6 @@ window.CACHANILLA = {
       "destacado": false,
       "img": "assets/img/productos/roles-canela.jpg",
       "desc": "Rol suave de canela, perfecto con café o champurrado."
-    },
-    {
-      "id": "p1",
-      "nombre": "Concha",
-      "precio": 3.5,
-      "cat": "Pan dulce",
-      "disponible": false,
-      "destacado": false,
-      "img": "assets/img/productos/concha.jpg",
-      "desc": "El clásico: pan suave con su costra de azúcar en chocolate o vainilla.",
-      "opciones": [
-        "Chocolate",
-        "Vainilla"
-      ]
     },
     {
       "id": "p8",
