@@ -22,6 +22,8 @@ window.CUENTAS = {
     { usuario: "lacachanillamx@outlook.com", nombre: "La Cachanilla", correo: "lacachanillamx@outlook.com", whatsapp: "19392540736", rol: "dueño", alta: "2026-11-20",
       hash: "c69cd99a952066bdb93957bd72eff523aacdc65ce614297b707d55866a6426fa" },
     { usuario: "spm.biokinet@gmail.com", nombre: "Samuel (Biokinet)", correo: "spm.biokinet@gmail.com", whatsapp: "", rol: "dueño", alta: "2026-11-20",
-      hash: "eafca53c45ae7f765cf75264362b16cbdc563fedbcccee7445184dc67c867910" }
+      hash: "eafca53c45ae7f765cf75264362b16cbdc563fedbcccee7445184dc67c867910" },
+    { usuario: "edwin", nombre: "Edwin González", correo: "", whatsapp: "", rol: "cajero", alta: "2026-11-28",
+      hash: "994cb29e40d7152fb34fe01443101377c9f68c5b7bfc462ca8b8a99c33f76752" }
   ]
 };
