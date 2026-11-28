@@ -25,11 +25,15 @@ function catalogoActivo() {
 function marcarBaseCatalogo(v) { store.set('catalogo_base', v || window.CACHANILLA.actualizado || ''); }
 
 const AJUSTES_BASE = {
-  estatal: 6.0, municipal: 1.0, incluido: false,
+  estatal: 10.5, municipal: 1.0, incluido: false,
   negocio: 'La Cachanilla', telefono: '', lugar: '',
   gracias: '¡Gracias por tu compra! Un antojo mexicano, donde quiera que vayamos.'
 };
-const ajustes = () => Object.assign({}, AJUSTES_BASE, store.get('pos_ajustes', {}));
+const ajustes = () => {
+  const g = store.get('pos_ajustes', {});
+  if (Number(g.estatal) === 6 && Number(g.municipal) === 1 && !g.ivu115) { g.estatal = 10.5; g.ivu115 = true; store.set('pos_ajustes', g); }  // IVU regular 11.5%
+  return Object.assign({}, AJUSTES_BASE, g);
+};
 const ventas = () => store.get('pos_ventas', []);
 
 const diaKey = ts => { const d = new Date(ts); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
